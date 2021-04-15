@@ -8,19 +8,19 @@ let Position = require('./position');
 const Schema = mongoose.Schema;
 
 const playerSchema = new Schema({
-  espnID:     {type: String, required: true },
-  firstName:  {type: String, required: true },
-  lastName:   {type: String, required: true },
+  espnID: {type: String, required: true },
+  firstName: {type: String, required: true },
+  lastName: {type: String, required: true },
   birthPlace: {
-    city:   {type: String, required: true },
-    state:  {type: String, required: true }
+    city: {type: String, required: true },
+    state: {type: String, required: true }
   },
-  college:      College._id,
-  league:       League._id,
-  team:         Team._id,
+  college: {type: Schema.Types.ObjectId, ref: 'College'},
+  league: {type: Schema.Types.ObjectId, ref: 'League', required: true},
+  team: {type: Schema.Types.ObjectId, ref: 'Team'},
   jerseyNumber: {type: Number, required: true},
-  position:     Position._id,
-  contracts:    {type: Array, required: true}
+  position: {type: Schema.Types.ObjectId, ref: 'Position'},
+  contracts: {type: Array, required: true}
 }, {
   timestamps: true,
 });

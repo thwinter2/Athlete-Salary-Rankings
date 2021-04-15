@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
-    name:           {type: String, required: true, unique: true},
-    abbreviation:   {type: String, required: true}
+const positionSchema = new Schema({
+    name: {type: String, required: true, unique: true},
+    abbreviation: {type: String, required: true}
 }, {
     timestamps: true,
 });

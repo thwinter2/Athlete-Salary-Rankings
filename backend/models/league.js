@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
-const Team = require('./team');
 
 const Schema = mongoose.Schema;
 
 const leagueSchema = new Schema({
-    name:           {type: String, required: true, unique: true},
-    abbreviation:   {type: String, required: true, unique: true},
-    teams:          [{type: Schema.Types.ObjectId, ref: 'Team'}]
+    name: {type: String, required: true, unique: true},
+    abbreviation: {type: String, required: true, unique: true},
 }, {
     timestamps: true,
 });

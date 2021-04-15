@@ -10,6 +10,25 @@ const emptyTeamData = {
   location: 'Atlanta',
   abbreviation: 'ATL'
 };
+
+const playerData = {
+  espnID: '1',
+  firstName: 'Devonte',
+  lastName: 'Graham',
+  birthPlace: {
+    city: 'Raleigh',
+    state: 'NC'
+  },
+  jerseyNumber: 4,
+};
+
+const collegeData = {
+  espnID: '12',
+  mascot: 'Jayhawks',
+  name: 'Kansas',
+  abbreviation: 'KU'
+};
+
 const playersTeamData = {
   name: 'Hornets',
   location: 'Charlotte',
@@ -22,7 +41,6 @@ const playersTeamData = {
       city: 'Raleigh',
       state: 'NC'
     },
-    college: "Kansas"
   }]
 }
 

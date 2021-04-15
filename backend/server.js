@@ -18,10 +18,10 @@ connection.once('open', () => {
 });
 
 const playersRouter = require('./routes/players');
-const usersRouter = require('./routes/teams');
+const teamsRouter = require('./routes/routes');
 
 app.use('/players', playersRouter);
-app.use('/users', usersRouter);
+app.use('/routes', teamsRouter);
 
 app.listen(port, () => {
     console.log(`Server is running port: ${port}`);

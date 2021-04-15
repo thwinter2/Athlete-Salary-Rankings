@@ -1,19 +1,11 @@
-const path = require('path');
+const router = require('express').Router();
 const Team = require('../models/team');
 
-exports.getTeams = async(req, res) => {
-  try {
-    const teams = await Team.find()
-      .populate('players');
-      res.status(200).json({
-        success: true,
-        message: 'Fetched all teams successfully',
-        teams: teams
-      });
-  } catch(err) {
-      res.status(400).json({success: false, message: 'Could not get all Teams'})
-  }
-};
+router.route('/').get((req, res) => {
+  Exercise.find()
+    .then(teams => res.json(teams))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
 
 router.route('/add').post((req, res) => {
   const name = req.body.name;

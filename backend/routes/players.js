@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Player = require('../models/player');
 
 router.route('/players').get((req, res) => {
-  Exercise.find()
+  Player.find()
     .then(players => res.json(players))
     .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -16,7 +16,6 @@ router.route('/players/add').post((req, res) => {
   const league = req.body.league;
   const team = req.body.team;
   const jerseyNumber = req.body.jerseyNumber;
-  const position = req.body.position;
   const contracts = req.body.contracts;
 
   const newPlayer = new Player({
@@ -28,7 +27,6 @@ router.route('/players/add').post((req, res) => {
     league,
     team,
     jerseyNumber,
-    position,
     contracts,
   });
 
@@ -45,7 +43,7 @@ router.route('/players/:id').get((req, res) => {
   
 router.route('/players/:id').delete((req, res) => {
   Player.findByIdAndDelete(req.params.id)
-  .then(() => res.json('Exercise deleted.'))
+  .then(() => res.json('Player deleted.'))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
@@ -60,11 +58,10 @@ router.route('/players/update/:id').post((req, res) => {
     player.league = req.body.league;
     player.team = req.body.team;
     player.jerseyNumber = req.body.jerseyNumber;
-    player.position = req.body.position;
     player.contracts = req.body.contracts;
   
     player.save()
-    .then(() => res.json('Exercise updated!'))
+    .then(() => res.json('Player updated!'))
     .catch(err => res.status(400).json('Error: ' + err))
     })
     .catch(err => res.status(400).json('Error: ' + err))

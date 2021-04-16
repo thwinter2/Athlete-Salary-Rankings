@@ -2,7 +2,7 @@ const router = require('express').Router();
 const College = require('../models/college');
 
 router.route('/colleges').get((req, res) => {
-  Exercise.find()
+  College.find()
     .then(colleges => res.json(colleges))
     .catch(err => res.status(400).json('Error: ' + err));
 });
@@ -33,7 +33,7 @@ router.route('/colleges/:id').get((req, res) => {
   
 router.route('/colleges/:id').delete((req, res) => {
   College.findByIdAndDelete(req.params.id)
-  .then(() => res.json('Exercise deleted.'))
+  .then(() => res.json('College deleted.'))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
@@ -46,7 +46,7 @@ router.route('/colleges/update/:id').post((req, res) => {
     college.abbreviation = req.body.abbreviation;
   
     college.save()
-    .then(() => res.json('Exercise updated!'))
+    .then(() => res.json('College updated!'))
     .catch(err => res.status(400).json('Error: ' + err))
     })
     .catch(err => res.status(400).json('Error: ' + err))

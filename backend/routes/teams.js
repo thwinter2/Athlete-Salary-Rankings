@@ -1,13 +1,13 @@
 const router = require('express').Router();
 const Team = require('../models/team');
 
-router.route('/').get((req, res) => {
-  Exercise.find()
+router.route('/teams').get((req, res) => {
+  Team.find()
     .then(teams => res.json(teams))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/add').post((req, res) => {
+router.route('/teams/add').post((req, res) => {
   const name = req.body.name;
   const location = req.body.location;
   const abbreviation = req.body.abbreviation;
@@ -25,19 +25,19 @@ router.route('/add').post((req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/:id').get((req, res) => {
+router.route('/teams/:id').get((req, res) => {
   Team.findById(req.params.id)
   .then(team => res.json(team))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/:id').delete((req, res) => {
+router.route('/teams/:id').delete((req, res) => {
   Team.findByIdAndDelete(req.params.id)
-  .then(() => res.json('Exercise deleted.'))
+  .then(() => res.json('Team deleted.'))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/update/:id').post((req, res) => {
+router.route('/teams/update/:id').post((req, res) => {
   Team.findById(req.params.id)
   .then(team => {
     team.name = req.body.name;
@@ -46,7 +46,7 @@ router.route('/update/:id').post((req, res) => {
     team.players = req.body.players;
   
     team.save()
-    .then(() => res.json('Exercise updated!'))
+    .then(() => res.json('Team updated!'))
     .catch(err => res.status(400).json('Error: ' + err))
     })
     .catch(err => res.status(400).json('Error: ' + err))

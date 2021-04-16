@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
-let Player = require('./player');
 
 const Schema = mongoose.Schema;
 
 const teamSchema = new Schema({
+    _id: Schema.Types.ObjectId,
     name: {type: String, required: true, unique: true},
     location: {type: String, required: true, unique: true},
     abbreviation: {type: String, required: true, unique: true},
+    players: [{type: Schema.Types.ObjectId, ref: 'Player'}],
 }, {
     timestamps: true,
 });

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Team = require('../models/team');
+const got = require("got");
 
 router.route('/teams').get((req, res) => {
   Team.find()
@@ -8,6 +9,24 @@ router.route('/teams').get((req, res) => {
 });
 
 router.route('/teams/add').post((req, res) => {
+  const name = req.body.name;
+  const location = req.body.location;
+  const abbreviation = req.body.abbreviation;
+  const players = req.body.players;
+
+  const newTeam = new Team({
+    name,
+    location,
+    abbreviation,
+    players
+  });
+
+  newTeam.save()
+  .then(() => res.json('Team Added!'))
+  .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/teams/add-all').get((req, res) => {
   const name = req.body.name;
   const location = req.body.location;
   const abbreviation = req.body.abbreviation;

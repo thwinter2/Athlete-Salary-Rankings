@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Player = require('../models/player');
+const {getAthletes} = require('../nba.js');
 
 router.route('/players').get((req, res) => {
   Player.find()
@@ -15,7 +16,7 @@ router.route('/players/add').post((req, res) => {
   const college = req.body.college;
   const league = req.body.league;
   const team = req.body.team;
-  const jerseyNumber = req.body.jerseyNumber;
+  const jersey = req.body.jerseyNumber;
   const contracts = req.body.contracts;
 
   const newPlayer = new Player({
@@ -26,9 +27,33 @@ router.route('/players/add').post((req, res) => {
     college,
     league,
     team,
-    jerseyNumber,
+    jersey,
     contracts,
   });
+
+router.route('/players/nba/add-all').get((req, res) => {
+  for(let team of teams.NBA){
+    let athletes = await getAthletes(key, team);
+      for(let newPlayer of athletes){
+        newPlayer.save()
+      .then(() => res.json('Player Added!'))
+      .catch(err => res.status(400).json('Error: ' + err));
+    }
+  }
+});
+
+router.route('/players/add-all').get((req, res) => {
+  Object.keys(teams).forEach((key) => {
+    for(let team of teams[key]){
+      let athletes = await getAthletes(key, team);
+      for(let newPlayer of athletes){
+        newPlayer.save()
+        .then(() => res.json('Player Added!'))
+        .catch(err => res.status(400).json('Error: ' + err));
+      }
+    }
+  })
+});
 
   newPlayer.save()
   .then(() => res.json('Player Added!'))
@@ -57,7 +82,7 @@ router.route('/players/update/:id').post((req, res) => {
     player.college = req.body.college;
     player.league = req.body.league;
     player.team = req.body.team;
-    player.jerseyNumber = req.body.jerseyNumber;
+    player.jersey = req.body.jerseyNumber;
     player.contracts = req.body.contracts;
   
     player.save()

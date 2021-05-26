@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const Team = require('../models/team');
 const got = require("got");
+const getTeam = require("../nba.js");
+const {links, teams} = require("../globals.js");
 
 router.route('/teams').get((req, res) => {
   Team.find()
@@ -9,16 +11,16 @@ router.route('/teams').get((req, res) => {
 });
 
 router.route('/teams/add').post((req, res) => {
-  const name = req.body.name;
   const location = req.body.location;
+  const name = req.body.name;
   const abbreviation = req.body.abbreviation;
-  const players = req.body.players;
+  // const players = req.body.players;
 
   const newTeam = new Team({
-    name,
     location,
+    name,
     abbreviation,
-    players
+    // players
   });
 
   newTeam.save()
@@ -26,22 +28,24 @@ router.route('/teams/add').post((req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/teams/nba/add-all').get((req, res) => {
+  for(let team of teams.NBA){
+    let newTeam = await getTeam('NBA', team);
+    newTeam.save()
+    .then(() => res.json('Team Added!'))
+    .catch(err => res.status(400).json('Error: ' + err));
+  }
+});
+
 router.route('/teams/add-all').get((req, res) => {
-  const name = req.body.name;
-  const location = req.body.location;
-  const abbreviation = req.body.abbreviation;
-  const players = req.body.players;
-
-  const newTeam = new Team({
-    name,
-    location,
-    abbreviation,
-    players
-  });
-
-  newTeam.save()
-  .then(() => res.json('Team Added!'))
-  .catch(err => res.status(400).json('Error: ' + err));
+  Object.keys(teams).forEach((key) => {
+    for(let team of teams[key]){
+      let newTeam = await getTeam(key, team);
+      newTeam.save()
+      .then(() => res.json('Team Added!'))
+      .catch(err => res.status(400).json('Error: ' + err));
+    }
+  })
 });
 
 router.route('/teams/:id').get((req, res) => {
@@ -62,8 +66,7 @@ router.route('/teams/update/:id').post((req, res) => {
     team.name = req.body.name;
     team.location = req.body.location;
     team.abbreviation = req.body.abbreviation;
-    team.players = req.body.players;
-  
+      
     team.save()
     .then(() => res.json('Team updated!'))
     .catch(err => res.status(400).json('Error: ' + err))

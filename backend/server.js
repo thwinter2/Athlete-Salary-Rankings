@@ -20,13 +20,11 @@ connection.once('open', () => {
 const collegesRouter = require('./routes/colleges');
 const leaguesRouter = require('./routes/leagues');
 const playersRouter = require('./routes/players');
-const positionsRouter = require('./routes/positions');
 const teamsRouter = require('./routes/teams');
 
 app.use('/colleges', collegesRouter);
 app.use('/leagues', leaguesRouter);
 app.use('/players', playersRouter);
-app.use('/positions', positionsRouter);
 app.use('/teams', teamsRouter);
 
 app.listen(port, () => {

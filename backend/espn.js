@@ -7,15 +7,11 @@ const headers = {
   'Content-Type':'application/json',
 }
 
-// let nba_teams = ['ATL','BKN','BOS','CHA','CHI','CLE','DAL','DEN','DET',
-//   'GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NO','NYK',
-//   'OKC','ORL','PHI','PHX','POR','SAC','SA','TOR','UTAH','WAS'];
-
 async function listAthletesOfSchool(school){
-  for(let team of teams.nba){
+  for(let team of teams.NBA){
     var team_name = true;
-    let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links.nba+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
-                        .catch(err => console.error(`listAthletesOfSchool ${err}`));          
+    let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links.NBA+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
+                        .catch(err => console.error(`listAthletesOfSchool ${err}`));
     if( !response ) return;
 
     if(response.body.athletes){
@@ -34,17 +30,39 @@ async function listAthletesOfSchool(school){
   }
 }
 
+async function getAthletes(league, team){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
+                      .catch(err => console.error(`listAthletesOfSchool ${err}`));
+  if( !response ) return;
+
+  if(response.body.athletes){
+    return response.body.athletes;
+  }
+}
+
 async function listAthletesOfTeam(team){
-  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links.nba+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links.NBA+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
                       .catch(err => console.error(`listAthletesOfTeam ${err}`));                  
   if( !response ) return;
 
   if(response.body.athletes){
-    for(let athlete of response.body.athletes){
-      console.log(athlete);
-    }
+    // for(let athlete of response.body.athletes){
+    //   console.log(athlete);
+    // }
+    console.log(response.body.athletes[0]);
   }
 }
+
+async function getTeamSize(league, team){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
+                      .catch(err => console.error(`listAthletesOfTeam ${err}`));                  
+  if( !response ) return;
+
+  if(response.body.athletes){
+    return response.body.athletes.length;
+  }
+}
+
 
 async function listTeamsOfLeague(league){
   var count = 0;
@@ -62,13 +80,14 @@ async function listTeamsOfLeague(league){
   console.log(teams[league].length);
 }
 
-async function listTeam(league, team){
+async function getTeam(league, team){
   let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team, { headers: headers, responseType: 'json' })
                       .catch(err => console.error(`listTeam ${err}`));
   if( !response ) return;
 
   if(response.body){
-    console.log(response.body.team);
+    // console.log(response.body.team);
+    return response.body.team;
   }
 }
 
@@ -84,9 +103,9 @@ async function listTeamsTest(){
 
 async function main(){
   // listAthletesOfSchool('North Carolina');
-  // listAthletesOfTeam('CHA');
-  listTeamsOfLeague('mlb');
-  // listTeam('nfl','ATL');
+  listAthletesOfTeam('DAL');
+  // listTeamsOfLeague('MLB');
+  // listTeam('NBA','ATL');
   // listTeamsTest();
 
 };
@@ -95,4 +114,4 @@ async function main(){
   await main();
 })();
 
-// export {listAthletesOfSchool, listAthletesOfTeam, listTeams, listTeam};
+module.exports = {listAthletesOfSchool, listAthletesOfTeam, listTeamsOfLeague, getAthletes, getTeam, getTeamSize};

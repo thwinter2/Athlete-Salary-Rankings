@@ -7,6 +7,13 @@ const headers = {
   'Content-Type':'application/json',
 }
 
+var formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+});
+
 async function listAthletesOfSchool(school){
   for(let team of teams.NBA){
     var team_name = true;
@@ -36,6 +43,16 @@ async function getAthletes(league, team){
   if( !response ) return;
 
   if(response.body.athletes){
+    for(let athlete of response.body.athletes){
+      var earnings = athlete.contracts.reduce((previousValue, currentValue) => {
+        return {
+          salary: previousValue.salary + currentValue.salary
+        }
+      });
+      athlete.league = league;
+      athlete.team = team;
+      athlete.earnings = earnings;
+    }
     return response.body.athletes;
   }
 }
@@ -47,9 +64,19 @@ async function listAthletesOfTeam(team){
 
   if(response.body.athletes){
     // for(let athlete of response.body.athletes){
+    //   response.body.athletes[0].league = 'NBA';
+    //   response.body.athletes[0].team = team;
     //   console.log(athlete);
     // }
-    console.log(response.body.athletes[0]);
+    response.body.athletes[3].league = 'NBA';
+    response.body.athletes[3].team = team;
+    console.log(response.body.athletes[3]);
+    var earnings = 0;
+    for(contract of response.body.athletes[3].contracts){
+      earnings += contract.salary;
+    }
+    response.body.athletes[3].earnings = formatter.format(earnings);
+    console.log(response.body.athletes[3].earnings);
   }
 }
 

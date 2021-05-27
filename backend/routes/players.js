@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const Player = require('../models/player');
-const {getAthletes} = require('../nba.js');
+const {getAthletes} = require('../espn.js');
 
 router.route('/players').get((req, res) => {
   Player.find()
@@ -9,18 +9,17 @@ router.route('/players').get((req, res) => {
 });
 
 router.route('/players/add').post((req, res) => {
-  const espnID = req.body.espnID;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const birthPlace = req.body.birthPlace;
   const college = req.body.college;
   const league = req.body.league;
   const team = req.body.team;
-  const jersey = req.body.jerseyNumber;
+  const jersey = req.body.jersey;
+  const position = req.body.position;
   const contracts = req.body.contracts;
 
   const newPlayer = new Player({
-    espnID,
     firstName,
     lastName,
     birthPlace,
@@ -28,17 +27,22 @@ router.route('/players/add').post((req, res) => {
     league,
     team,
     jersey,
+    position,
     contracts,
+  });
+
+  router.route('/players/nba').get((req, res) => {
+    Player.find({league: 'NBA'})
+      .then(players => res.json(players))
+      .catch(err => res.status(400).json('Error: ' + err));
   });
 
 router.route('/players/nba/add-all').get((req, res) => {
   for(let team of teams.NBA){
     let athletes = await getAthletes(key, team);
-      for(let newPlayer of athletes){
-        newPlayer.save()
-      .then(() => res.json('Player Added!'))
+      Player.collection.insertMany(athletes)
+      .then(players => res.json(players))
       .catch(err => res.status(400).json('Error: ' + err));
-    }
   }
 });
 
@@ -46,11 +50,9 @@ router.route('/players/add-all').get((req, res) => {
   Object.keys(teams).forEach((key) => {
     for(let team of teams[key]){
       let athletes = await getAthletes(key, team);
-      for(let newPlayer of athletes){
-        newPlayer.save()
-        .then(() => res.json('Player Added!'))
-        .catch(err => res.status(400).json('Error: ' + err));
-      }
+      Player.collection.insertMany(athletes)
+      .then(players => res.json(players))
+      .catch(err => res.status(400).json('Error: ' + err));
     }
   })
 });

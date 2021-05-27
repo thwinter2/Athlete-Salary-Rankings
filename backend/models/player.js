@@ -17,14 +17,15 @@ const playerSchema = new Schema({
     name: {type: String},
     abbrev: {type: String}
   },
-  league: {type: Schema.Types.ObjectId, ref: 'League'},
-  team: {type: Schema.Types.ObjectId, ref: 'Team'},
+  league: {type: String, required: true },
+  team: {type: String, required: true },
   jersey: {type: Number, required: true},
   position: {
     name: {type: String},
     abbreviation: {type: String}
   },
-  contracts: {type: Array, required: true}
+  contracts: {type: Array, required: true},
+  earnings: {type: Number, required: true}
 }, {
   timestamps: true,
 });

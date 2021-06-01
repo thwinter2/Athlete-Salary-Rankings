@@ -9,12 +9,17 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-const uri = process.env.ATLAS_URI;
+
+let local = true;
+let uri = local ? 'mongodb://127.0.0.1:27017/AthleteSalaries' : process.env.ATLAS_URI;
 
 mongoose.connect(uri, {useNewUrlParser: true, useCreateIndex: true});
 const connection = mongoose.connection;
 connection.once('open', () => {
-    console.log("MongoDB database connection established successfully");
+  console.log("MongoDB database connection established successfully");
+});
+connection.on('error', err => {
+  console.error('connection error:', err)
 });
 
 const collegesRouter = require('./routes/colleges');
@@ -28,5 +33,5 @@ app.use('/players', playersRouter);
 app.use('/teams', teamsRouter);
 
 app.listen(port, () => {
-    console.log(`Server is running port: ${port}`);
+  console.log(`Server is running port: ${port}`);
 });

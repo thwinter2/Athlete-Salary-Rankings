@@ -38,15 +38,16 @@ router.route('/nba/add-all').get(async (req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/add-all').get((req, res) => {
-  Object.keys(teams).forEach((key) => {
+router.route('/add-all').get(async (req, res) => {
+  let newTeams = [];
+  Object.keys(teams).forEach(async (key) => {
     for(let team of teams[key]){
-      let newTeam = getTeam(key, team);
-      newTeam.save()
-      .then(() => res.json('All Teams Added!'))
-      .catch(err => res.status(400).json('Error: ' + err));
+      newTeams.push(await getTeam(key, team));
     }
   })
+  Team.collection.insertMany(newTeams)
+  .then(() => res.json('All Teams Added!'))
+  .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/:id').get((req, res) => {

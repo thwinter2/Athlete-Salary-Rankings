@@ -141,14 +141,14 @@ async function listTeamsTest(){
 async function main(){
   // listAthletesOfSchool('North Carolina');
   // listAthletesOfTeam('DAL');
-  // listTeamsOfLeague('MLB');
+  listTeamsOfLeague('NBA');
   // listTeam('NBA','ATL');
   // listTeamsTest();
 
 };
   
-(async () => {
-  await main();
-})();
+// (async () => {
+//   await main();
+// })();
 
 module.exports = {listAthletesOfSchool, listAthletesOfTeam, listTeamsOfLeague, getAthletes, getTeam, getTeamSize};

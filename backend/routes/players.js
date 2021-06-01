@@ -38,23 +38,27 @@ router.route('/add').post((req, res) => {
   });
 
 router.route('/nba/add-all').get((req, res) => {
+  let newPlayers = [];
   for(let team of teams.NBA){
-    let athletes = getAthletes(key, team);
-      Player.collection.insertMany(athletes)
-      .then(players => res.json(players))
-      .catch(err => res.status(400).json('Error: ' + err));
+    let importedAthletes = await getAthletes(key, team);
+    newPlayers.push(...importedAthletes);
   }
+  Player.collection.insertMany(newPlayers)
+  .then(() => res.json('All NBA Players Added!'))
+  .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/add-all').get((req, res) => {
-  Object.keys(teams).forEach((key) => {
+router.route('/add-all').get(async (req, res) => {
+  let newPlayers = [];
+  Object.keys(teams).forEach(async (key) => {
     for(let team of teams[key]){
-      let athletes = getAthletes(key, team);
-      Player.collection.insertMany(athletes)
-      .then(players => res.json(players))
-      .catch(err => res.status(400).json('Error: ' + err));
+      let importedAthletes = await getAthletes(key, team);
+      newPlayers.push(...importedAthletes);
     }
   })
+  Player.collection.insertMany(newPlayers)
+  .then(() => res.json('All Players Added!'))
+  .catch(err => res.status(400).json('Error: ' + err));
 });
 
   newPlayer.save()

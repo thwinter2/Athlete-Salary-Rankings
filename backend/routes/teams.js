@@ -27,6 +27,12 @@ router.route('/add').post((req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
+router.route('/nba').get((req, res) => {
+Team.find({uid: /s:40~l:46~.*/})
+    .then(teams => res.json(teams))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
 router.route('/nba/add-all').get(async (req, res) => {
   let newTeams = [];
   for(let team of teams.NBA){

@@ -113,7 +113,7 @@ async function getTeam(league, team){
   if( !response ) return;
 
   if(response.body){
-    // console.log(response.body.team);
+    response.body.team.league = league;
     return response.body.team;
   }
 }
@@ -124,6 +124,7 @@ async function listTeam(league, team){
   if( !response ) return;
 
   if(response.body){
+    response.body.team.league = league;
     console.log(response.body.team);
   }
 }
@@ -141,14 +142,14 @@ async function listTeamsTest(){
 async function main(){
   // listAthletesOfSchool('North Carolina');
   // listAthletesOfTeam('DAL');
-  listTeamsOfLeague('NBA');
-  // listTeam('NBA','ATL');
+  // listTeamsOfLeague('NBA');
+  // listTeam('NFL','ATL');
   // listTeamsTest();
 
 };
   
-// (async () => {
-//   await main();
-// })();
+(async () => {
+  await main();
+})();
 
 module.exports = {listAthletesOfSchool, listAthletesOfTeam, listTeamsOfLeague, getAthletes, getTeam, getTeamSize};

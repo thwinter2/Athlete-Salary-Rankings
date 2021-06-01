@@ -118,6 +118,16 @@ async function getTeam(league, team){
   }
 }
 
+async function listTeam(league, team){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team, { headers: headers, responseType: 'json' })
+                      .catch(err => console.error(`listTeam ${err}`));
+  if( !response ) return;
+
+  if(response.body){
+    console.log(response.body.team);
+  }
+}
+
 async function listTeamsTest(){
   let response = await got('http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams', { headers: headers, responseType: 'json' })
                       .catch(err => console.error(`listTeams ${err}`));
@@ -130,7 +140,7 @@ async function listTeamsTest(){
 
 async function main(){
   // listAthletesOfSchool('North Carolina');
-  listAthletesOfTeam('DAL');
+  // listAthletesOfTeam('DAL');
   // listTeamsOfLeague('MLB');
   // listTeam('NBA','ATL');
   // listTeamsTest();

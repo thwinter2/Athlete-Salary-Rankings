@@ -1,13 +1,13 @@
 const router = require('express').Router();
 const College = require('../models/college');
 
-router.route('/colleges').get((req, res) => {
+router.route('/').get((req, res) => {
   College.find()
     .then(colleges => res.json(colleges))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/colleges/add').post((req, res) => {
+router.route('/add').post((req, res) => {
   const espnID = req.body.espnID;
   const mascot = req.body.mascot;
   const name = req.body.name;
@@ -25,19 +25,19 @@ router.route('/colleges/add').post((req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/colleges/:id').get((req, res) => {
+router.route('/:id').get((req, res) => {
   College.findById(req.params.id)
   .then(college => res.json(college))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/colleges/:id').delete((req, res) => {
+router.route('/:id').delete((req, res) => {
   College.findByIdAndDelete(req.params.id)
   .then(() => res.json('College deleted.'))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/colleges/update/:id').post((req, res) => {
+router.route('/update/:id').post((req, res) => {
   College.findById(req.params.id)
   .then(college => {
     college.espnID = req.body.espnID;

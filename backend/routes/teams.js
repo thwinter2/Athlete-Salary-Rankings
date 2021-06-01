@@ -1,16 +1,15 @@
 const router = require('express').Router();
 const Team = require('../models/team');
-const got = require("got");
-const getTeam = require("../nba.js");
+const {getTeam} = require("../espn.js");
 const {links, teams} = require("../globals.js");
 
-router.route('/teams').get((req, res) => {
+router.route('/').get((req, res) => {
   Team.find()
     .then(teams => res.json(teams))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/teams/add').post((req, res) => {
+router.route('/add').post((req, res) => {
   const location = req.body.location;
   const name = req.body.name;
   const abbreviation = req.body.abbreviation;
@@ -28,39 +27,41 @@ router.route('/teams/add').post((req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/teams/nba/add-all').get((req, res) => {
+router.route('/nba/add-all').get(async (req, res) => {
+  let newTeams = [];
   for(let team of teams.NBA){
-    let newTeam = await getTeam('NBA', team);
-    newTeam.save()
-    .then(() => res.json('Team Added!'))
-    .catch(err => res.status(400).json('Error: ' + err));
+    newTeams.push(await getTeam('NBA', team));
   }
+  console.log(newTeams[0]);
+  Team.collection.insertMany(newTeams)
+  .then(() => res.json('All NBA Teams Added!'))
+  .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/teams/add-all').get((req, res) => {
+router.route('/add-all').get((req, res) => {
   Object.keys(teams).forEach((key) => {
     for(let team of teams[key]){
-      let newTeam = await getTeam(key, team);
+      let newTeam = getTeam(key, team);
       newTeam.save()
-      .then(() => res.json('Team Added!'))
+      .then(() => res.json('All Teams Added!'))
       .catch(err => res.status(400).json('Error: ' + err));
     }
   })
 });
 
-router.route('/teams/:id').get((req, res) => {
+router.route('/:id').get((req, res) => {
   Team.findById(req.params.id)
   .then(team => res.json(team))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/teams/:id').delete((req, res) => {
+router.route('/:id').delete((req, res) => {
   Team.findByIdAndDelete(req.params.id)
   .then(() => res.json('Team deleted.'))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/teams/update/:id').post((req, res) => {
+router.route('/update/:id').post((req, res) => {
   Team.findById(req.params.id)
   .then(team => {
     team.name = req.body.name;

@@ -2,13 +2,13 @@ const router = require('express').Router();
 const Player = require('../models/player');
 const {getAthletes} = require('../espn.js');
 
-router.route('/players').get((req, res) => {
+router.route('/').get((req, res) => {
   Player.find()
     .then(players => res.json(players))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/players/add').post((req, res) => {
+router.route('/add').post((req, res) => {
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
   const birthPlace = req.body.birthPlace;
@@ -31,25 +31,25 @@ router.route('/players/add').post((req, res) => {
     contracts,
   });
 
-  router.route('/players/nba').get((req, res) => {
+  router.route('/nba').get((req, res) => {
     Player.find({league: 'NBA'})
       .then(players => res.json(players))
       .catch(err => res.status(400).json('Error: ' + err));
   });
 
-router.route('/players/nba/add-all').get((req, res) => {
+router.route('/nba/add-all').get((req, res) => {
   for(let team of teams.NBA){
-    let athletes = await getAthletes(key, team);
+    let athletes = getAthletes(key, team);
       Player.collection.insertMany(athletes)
       .then(players => res.json(players))
       .catch(err => res.status(400).json('Error: ' + err));
   }
 });
 
-router.route('/players/add-all').get((req, res) => {
+router.route('/add-all').get((req, res) => {
   Object.keys(teams).forEach((key) => {
     for(let team of teams[key]){
-      let athletes = await getAthletes(key, team);
+      let athletes = getAthletes(key, team);
       Player.collection.insertMany(athletes)
       .then(players => res.json(players))
       .catch(err => res.status(400).json('Error: ' + err));
@@ -62,19 +62,19 @@ router.route('/players/add-all').get((req, res) => {
   .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/players/:id').get((req, res) => {
+router.route('/:id').get((req, res) => {
   Player.findById(req.params.id)
   .then(player => res.json(player))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/players/:id').delete((req, res) => {
+router.route('/:id').delete((req, res) => {
   Player.findByIdAndDelete(req.params.id)
   .then(() => res.json('Player deleted.'))
   .catch(err => res.status(400).json('Error: ' + err))
   });
   
-router.route('/players/update/:id').post((req, res) => {
+router.route('/update/:id').post((req, res) => {
   Player.findById(req.params.id)
   .then(player => {
     player.espnID = req.body.espnID;

@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const League = require('../models/league');
+const {links, teams} = require("../globals.js");
+const { getLeague } = require('../espn');
 
 router.route('/').get((req, res) => {
   League.find()
@@ -21,6 +23,16 @@ router.route('/add').post((req, res) => {
   newleague.save()
   .then(() => res.json('League added!'))
   .catch(err => res.status(400).json('error: ' + err));
+});
+
+router.route('/add-all').get(async (req, res) => {
+  let newLeagues = [];
+  Object.keys(teams).forEach(async (key) => {
+    newLeagues.push(await getLeague(key));
+  })
+  League.collection.insertMany(newLeagues)
+  .then(() => res.json('All Leagues Added!'))
+  .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/:id').get((req, res) => {

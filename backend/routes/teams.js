@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const Team = require('../models/team');
-const {getTeam, getTeamsOfLeague} = require("../espn.js");
+const {Team} = require('../models/team');
+const League = require('../models/league');
+const {getTeam, getTeamsOfLeague, getLeague} = require("../espn.js");
 const {links, teams} = require("../globals.js");
 
 router.route('/').get((req, res) => {
@@ -16,10 +17,14 @@ router.route('/add').post((req, res) => {
   // const players = req.body.players;
 
   const newTeam = new Team({
-    location,
-    name,
-    abbreviation,
-    // players
+    // id,
+    // uid,
+    // slug,
+    // location,
+    // name,
+    // abbreviation,
+    // displayName,
+    // shortDisplayName,
   });
 
   newTeam.save()
@@ -35,13 +40,38 @@ Team.find({uid: /s:40~l:46~.*/})
 
 router.route('/nba/add-all').get(async (req, res) => {
   let newTeams = [];
-  for(let team of teams.NBA){
-    newTeams.push(await getTeam('NBA', team));
+  let importedTeams = await getTeamsOfLeague('NBA');
+  for(let singleTeam of importedTeams){
+    newTeams.push(singleTeam.team);
   }
-  console.log(newTeams[0]);
   Team.collection.insertMany(newTeams)
   .then(() => res.json('All NBA Teams Added!'))
   .catch(err => res.status(400).json('Error: ' + err));
+});
+
+router.route('/league/nba/add-all').get(async (req, res) => {
+  let newTeams = [];
+  let importedTeams = await getTeamsOfLeague('NBA');
+  for(let singleTeam of importedTeams){
+    newTeams.push(singleTeam.team);
+  }
+  League.findOne({abbreviation: 'NBA'})
+    .then(result => {
+      newTeams.forEach(newTeam => {
+        newTeam.league = result._id;
+      })
+      result.teams = newTeams
+      return newTeams;
+    })
+    .then(newTeams => {
+      Team.collection.insertMany(newTeams)
+    })
+    // .then(Team.find().populate('league').exec())
+    .then(() => res.json('All NBA Teams Added!'))
+    .catch(err => res.status(400).json('Error: ' + err));
+
+  const league = await League.collection.findOne({abbreviation: 'NBA'});
+  await league.populate('teams').execPopulate();
 });
 
 // router.route('/add-all').get(async (req, res) => {
@@ -58,10 +88,12 @@ router.route('/nba/add-all').get(async (req, res) => {
 
 router.route('/add-all').get(async (req, res) => {
   let newTeams = [];
-  Object.keys(teams).forEach(async (key) => {
-    let importedTeams = await getTeamsOfLeague(key);
-    newTeams.push(...importedTeams);
-  })
+  for(let league of Object.keys(links)){
+    let importedTeams = await getTeamsOfLeague(league);
+    for(let singleTeam of importedTeams){
+      newTeams.push(singleTeam.team);
+    }
+  }
   Team.collection.insertMany(newTeams)
   .then(() => res.json('All Teams Added!'))
   .catch(err => res.status(400).json('Error: ' + err));

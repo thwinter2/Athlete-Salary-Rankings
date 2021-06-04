@@ -39,7 +39,7 @@ async function listAthletesOfSchool(school){
 
 async function getAthletes(league, team){
   let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
-                      .catch(err => console.error(`listAthletesOfSchool ${err}`));
+                      .catch(err => console.error(`getAthletes ${err}`));
   if( !response ) return;
 
   if(response.body.athletes){
@@ -63,11 +63,6 @@ async function listAthletesOfTeam(team){
   if( !response ) return;
 
   if(response.body.athletes){
-    // for(let athlete of response.body.athletes){
-    //   response.body.athletes[0].league = 'NBA';
-    //   response.body.athletes[0].team = team;
-    //   console.log(athlete);
-    // }
     response.body.athletes[3].league = 'NBA';
     response.body.athletes[3].team = team;
     console.log(response.body.athletes[3]);
@@ -77,6 +72,27 @@ async function listAthletesOfTeam(team){
     }
     response.body.athletes[3].earnings = formatter.format(earnings);
     console.log(response.body.athletes[3].earnings);
+  }
+}
+
+async function listCollegesOfAthletesOfTeam(league, team){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
+                      .catch(err => console.error(`listAthletesOfTeam ${err}`));                  
+  if( !response ) return;
+
+  if(response.body.athletes){
+    let athletes = []
+    if(league == 'NFL' || league == 'MLB' || league == 'NHL'){
+      for(let position of response.body.athletes){
+        athletes.push(...position.items);
+      }
+    }
+    else{
+      athletes.push(...response.body.athletes);
+    }
+    for(let athlete of athletes){
+      console.log(athlete.college);
+    }
   }
 }
 
@@ -113,12 +129,21 @@ async function getTeam(league, team){
 }
 
 async function getLeague(league){
+  // console.log(leagueLink);
   let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams?limit=1000', { headers: headers, responseType: 'json' })
-                      .catch(err => console.error(`listTeam ${err}`));
+                      .catch(err => console.error(`getLeague ${err}`));
   if( !response ) return;
 
   if(response.body){
-    return response.body.sports[0].leagues[0];
+    // let teamsArray = [];
+    let league = response.body.sports[0].leagues[0];
+    // for(let singleTeam of league.teams){
+    //   teamsArray.push(singleTeam.team);
+    // }
+    // league.teams = teamsArray;
+    // league.teams = null;
+    // console.log(league);
+    return league;
   }
 }
 
@@ -135,12 +160,13 @@ async function listTeam(league, team){
 
 async function listTeamsTest(){
   let response = await got('http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?limit=1000', { headers: headers, responseType: 'json' })
-                      .catch(err => console.error(`listTeams ${err}`));
+                      .catch(err => console.error(`listTeamsTest ${err}`));
   if( !response ) return;
 
   if(response.body){
     let league = response.body.sports[0].leagues[0];
-    league.teams = [];
+    let teams = league.teams;
+    // league.teams = [];
     console.log(league);
     // for(let team of response.body.sports[0].leagues[0].teams){
     //   console.log(team.team);
@@ -153,7 +179,8 @@ async function main(){
   // listAthletesOfTeam('DAL');
   // listTeamsOfLeague('NBA');
   // listTeam('NFL','ATL');
-  listTeamsTest();
+  // listTeamsTest();
+  // listCollegesOfAthletesOfTeam('NHL','CAR');
 
 };
   

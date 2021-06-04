@@ -1,12 +1,12 @@
 var links = {
   NBA: 'basketball/nba/',
   WNBA: 'basketball/wnba/',
-  CMBB: 'basketball/mens-college-basketball/',
-  CWBB: 'basketball/womens-college-basketball/',
+  // NCAAM: 'basketball/mens-college-basketball/',
+  // NCAAW: 'basketball/womens-college-basketball/',
   NFL: 'football/nfl/',
-  CFB: 'football/college-football/',
-  MLB: 'baseball/mlb',
-  CBASE: 'baseball/college-baseball/',
+  // NCAAF: 'football/college-football/',
+  MLB: 'baseball/mlb/',
+  // CBASE: 'baseball/college-baseball/',
   NHL: 'hockey/nhl/',
 }
 

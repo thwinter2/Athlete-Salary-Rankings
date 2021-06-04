@@ -41,7 +41,7 @@ router.route('/nba').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-router.route('/nba/add-all').get((req, res) => {
+router.route('/nba/add-all').get(async (req, res) => {
 let newPlayers = [];
 for(let team of teams.NBA){
   let importedAthletes = await getAthletes(key, team);

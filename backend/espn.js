@@ -189,7 +189,7 @@ async function listTeamsTest(){
 
 async function main(){
   // listAthletesOfSchool('North Carolina');
-  listAthletesOfTeam('NBA','DAL');
+  // listAthletesOfTeam('NBA','DAL');
   // listTeamsOfLeague('NBA');
   // listTeam('NFL','ATL');
   // listTeamsTest();

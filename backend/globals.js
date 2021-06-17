@@ -22,7 +22,7 @@ var teams = {
   'PIT','SD','SEA','SF','STL','TB','TEX','TOR','WSH']
 }
 
-async function getTeamRosterAbbreviation(abbreviation){
+function getTeamRosterAbbreviation(abbreviation){
   let rosterLinkAbbreviation = '';
   switch (abbreviation){
     case ('GS'):

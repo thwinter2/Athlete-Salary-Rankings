@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const League = require('../models/league');
+const {League} = require('../models/league');
 const {links, teams, getTeamRosterAbbreviation} = require("../globals.js");
 const { getLeague, getAthletes } = require('../espn');
 var mongoose = require('mongoose');
@@ -44,9 +44,12 @@ router.route('/add-all').get(async (req, res) => {
 });
 
 router.route('/add-nba').get(async (req, res) => {
-  await League.collection.drop();
-  await Team.collection.drop();
-  await Player.collection.drop();
+  await League.collection.drop()
+    .catch();
+  await Team.collection.drop()
+    .catch();
+  await Player.collection.drop()
+    .catch();
   await getLeague('NBA')
   .then((league) => {
     let id = league.id;
@@ -56,6 +59,7 @@ router.route('/add-nba').get(async (req, res) => {
     let slug = league.slug;
     let teams = [];
     const newLeague = new League({
+      _id: new mongoose.Types.ObjectId(),
       id,
       name,
       abbreviation,
@@ -87,7 +91,7 @@ router.route('/add-nba').get(async (req, res) => {
         league,
         players,
       });
-      let rosterAbbreviation = await getTeamRosterAbbreviation(newTeam.abbreviation);
+      let rosterAbbreviation = getTeamRosterAbbreviation(newTeam.abbreviation);
       let athletes = await getAthletes('NBA', rosterAbbreviation);
       async.each(athletes, (playerData, callback) => {
         let id = playerData.id;
@@ -162,10 +166,12 @@ router.route('/add-nba').get(async (req, res) => {
         newTeam.save()
         .then(() => {
           newLeague.teams.push(newTeam);
+          console.log('2');
         })
       })
     })
     .then(() => {
+      console.log('3');
       newLeague.save()
       .then(() => res.json('NBA League Added!'))
       .catch(err => res.status(400).json('Error: ' + err));

@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const {teamSchema} = require('./team.js');
+const {leagueSchema} = require('./league.js');
 
 const Schema = mongoose.Schema;
 
@@ -46,8 +48,8 @@ const playerSchema = new Schema({
   // injuries: {type: Array},
   contracts: {type: Array},
   experience: {type: Number},
-  // league: {type: String, required: true},
-  // team: {type: String, required: true},
+  league: {type: Schema.Types.ObjectId, ref: 'League'},
+  team: {type: Schema.Types.ObjectId, ref: 'Team'},
   // earnings: {type: Number, required: true}
 }, {
   timestamps: true,

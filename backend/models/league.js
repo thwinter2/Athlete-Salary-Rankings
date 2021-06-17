@@ -4,6 +4,7 @@ const {teamSchema} = require('./team.js');
 const Schema = mongoose.Schema;
 
 const leagueSchema = new Schema({
+  _id: Schema.Types.ObjectId,
   id: {type: String, required: true, unique: true},
   name: {type: String, required: true, unique: true},
   abbreviation: {type: String, required: true, unique: true},
@@ -16,4 +17,4 @@ const leagueSchema = new Schema({
 
 const League = mongoose.model('League', leagueSchema);
 
-module.exports = League;
+module.exports = {League, leagueSchema};

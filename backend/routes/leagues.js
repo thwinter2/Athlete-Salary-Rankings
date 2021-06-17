@@ -72,8 +72,10 @@ router.route('/add-nba').get(async (req, res) => {
       let abbreviation = teamData.team.abbreviation;
       let displayName = teamData.team.displayName;
       let shortDisplayName = teamData.team.shortDisplayName;
+      let league = newLeague._id;
       let players = [];
       const newTeam = new Team({
+        _id: new mongoose.Types.ObjectId(),
         id,
         uid,
         slug,
@@ -82,30 +84,73 @@ router.route('/add-nba').get(async (req, res) => {
         abbreviation,
         displayName,
         shortDisplayName,
+        league,
         players,
       });
-      let abbrev = await getTeamRosterAbbreviation(newTeam.abbreviation);
-      let athletes = await getAthletes('NBA', abbrev);
+      let rosterAbbreviation = await getTeamRosterAbbreviation(newTeam.abbreviation);
+      let athletes = await getAthletes('NBA', rosterAbbreviation);
       async.each(athletes, (playerData, callback) => {
         let id = playerData.id;
         let uid = playerData.uid;
+        let guid = playerData.guid;
+        let alternateIds = playerData.alternateIds;
         let firstName = playerData.firstName;
         let lastName = playerData.lastName;
+        let fullName = playerData.fullName;
+        let displayName = playerData.displayName;
+        let shortName = playerData.shortName;
+        let weight = playerData.weight;
+        let displayWeight = playerData.displayWeight;
+        let height = playerData.height;
+        let displayHeight = playerData.displayHeight;
+        let age = playerData.age;
+        let dateOfBirth = playerData.dateOfBirth;
+        let debutYear = playerData.debutYear;
+        let links = playerData.links;
         let birthPlace = playerData.birthPlace;
         let college = playerData.college;
+        let slug = playerData.slug;
+        let headshot = playerData.headshot;
         let jersey = playerData.jersey;
+        let hand = playerData.hand;
         let position = playerData.position;
+        let injuries = playerData.injuries;
         let contracts = playerData.contracts;
+        let experience = playerData.experience.years;
+        let league = newTeam.league;
+        let team = newTeam._id;
+        let earnings = playerData.earnings;
         const newPlayer = new Player({
           id,
           uid,
+          guid,
+          alternateIds,
           firstName,
           lastName,
+          fullName,
+          displayName,
+          shortName,
+          weight,
+          displayWeight,
+          height,
+          displayHeight,
+          age,
+          dateOfBirth,
+          debutYear,
+          links,
           birthPlace,
           college,
+          slug,
+          headshot,
           jersey,
+          hand,
           position,
+          injuries,
           contracts,
+          experience,
+          league,
+          team,
+          earnings,
         });
         newPlayer.save()
         .then(() => {

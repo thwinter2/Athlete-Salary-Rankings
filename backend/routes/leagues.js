@@ -1,10 +1,12 @@
 const router = require('express').Router();
 const League = require('../models/league');
-const {links, teams} = require("../globals.js");
-const { getLeague } = require('../espn');
+const {links, teams, getTeamRosterAbbreviation} = require("../globals.js");
+const { getLeague, getAthletes } = require('../espn');
 var mongoose = require('mongoose');
 var async = require('async');
 const {Team} = require('../models/team');
+const {Player} = require('../models/player');
+
 
 router.route('/').get((req, res) => {
   League.find()
@@ -44,6 +46,7 @@ router.route('/add-all').get(async (req, res) => {
 router.route('/add-nba').get(async (req, res) => {
   await League.collection.drop();
   await Team.collection.drop();
+  await Player.collection.drop();
   await getLeague('NBA')
   .then((league) => {
     let id = league.id;
@@ -60,7 +63,7 @@ router.route('/add-nba').get(async (req, res) => {
       slug,
       teams,
     });
-    async.each(league.teams, (teamData, callback) => {
+    async.each(league.teams, async (teamData) => {
       let id = teamData.team.id;
       let uid = teamData.team.uid;
       let slug = teamData.team.slug;
@@ -69,6 +72,7 @@ router.route('/add-nba').get(async (req, res) => {
       let abbreviation = teamData.team.abbreviation;
       let displayName = teamData.team.displayName;
       let shortDisplayName = teamData.team.shortDisplayName;
+      let players = [];
       const newTeam = new Team({
         id,
         uid,
@@ -78,15 +82,45 @@ router.route('/add-nba').get(async (req, res) => {
         abbreviation,
         displayName,
         shortDisplayName,
+        players,
       });
-      newTeam.save()
+      let abbrev = await getTeamRosterAbbreviation(newTeam.abbreviation);
+      let athletes = await getAthletes('NBA', abbrev);
+      async.each(athletes, (playerData, callback) => {
+        let id = playerData.id;
+        let uid = playerData.uid;
+        let firstName = playerData.firstName;
+        let lastName = playerData.lastName;
+        let birthPlace = playerData.birthPlace;
+        let college = playerData.college;
+        let jersey = playerData.jersey;
+        let position = playerData.position;
+        let contracts = playerData.contracts;
+        const newPlayer = new Player({
+          id,
+          uid,
+          firstName,
+          lastName,
+          birthPlace,
+          college,
+          jersey,
+          position,
+          contracts,
+        });
+        newPlayer.save()
+        .then(() => {
+          newTeam.players.push(newPlayer);
+          callback();
+        })
+      })
       .then(() => {
-        newLeague.teams.push(newTeam);
-        callback();
+        newTeam.save()
+        .then(() => {
+          newLeague.teams.push(newTeam);
+        })
       })
     })
     .then(() => {
-      // League.collection.insertOne(newLeague)
       newLeague.save()
       .then(() => res.json('NBA League Added!'))
       .catch(err => res.status(400).json('Error: ' + err));

@@ -43,35 +43,35 @@ async function getAthletes(league, team){
   if( !response ) return;
 
   if(response.body.athletes){
-    for(let athlete of response.body.athletes){
-      var earnings = athlete.contracts.reduce((previousValue, currentValue) => {
-        return {
-          salary: previousValue.salary + currentValue.salary
-        }
-      });
-      athlete.league = league;
-      athlete.team = team;
-      athlete.earnings = earnings;
-    }
+    // for(let athlete of response.body.athletes){
+    //   var earnings = athlete.contracts.reduce((previousValue, currentValue) => {
+    //     return {
+    //       salary: previousValue.salary + currentValue.salary
+    //     }
+    //   });
+    //   athlete.league = league;
+    //   athlete.team = team;
+    //   athlete.earnings = earnings;
+    // }
     return response.body.athletes;
   }
 }
 
-async function listAthletesOfTeam(team){
-  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links.NBA+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
+async function listAthletesOfTeam(league, team){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team+'/roster', { headers: headers, responseType: 'json' })
                       .catch(err => console.error(`listAthletesOfTeam ${err}`));                  
   if( !response ) return;
 
   if(response.body.athletes){
     response.body.athletes[3].league = 'NBA';
     response.body.athletes[3].team = team;
-    console.log(response.body.athletes[3]);
+    console.log(response.body.athletes[0]);
     var earnings = 0;
     for(contract of response.body.athletes[3].contracts){
       earnings += contract.salary;
     }
     response.body.athletes[3].earnings = formatter.format(earnings);
-    console.log(response.body.athletes[3].earnings);
+    // console.log(response.body.athletes[3].earnings);
   }
 }
 
@@ -114,6 +114,19 @@ async function getTeamsOfLeague(league){
   
   if(response.body){
     return response.body.sports[0].leagues[0].teams
+  }
+}
+
+async function listTeamsOfLeague(league){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'/teams?limit=1000', { headers: headers, responseType: 'json' })
+                      .catch(err => console.error(`listTeams ${err}`));
+  if( !response ) return;
+  
+  if(response.body){
+    // console.log(response.body.sports[0].leagues[0].teams);
+    for(let teamData of response.body.sports[0].leagues[0].teams){
+      console.log(teamData.team.abbreviation);
+    }
   }
 }
 
@@ -176,7 +189,7 @@ async function listTeamsTest(){
 
 async function main(){
   // listAthletesOfSchool('North Carolina');
-  // listAthletesOfTeam('DAL');
+  listAthletesOfTeam('NBA','DAL');
   // listTeamsOfLeague('NBA');
   // listTeam('NFL','ATL');
   // listTeamsTest();

@@ -21,4 +21,24 @@ var teams = {
   'HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI',
   'PIT','SD','SEA','SF','STL','TB','TEX','TOR','WSH']
 }
-module.exports = {links, teams};
+
+async function getTeamRosterAbbreviation(abbreviation){
+  let rosterLinkAbbreviation = '';
+  switch (abbreviation){
+    case ('GS'):
+      rosterLinkAbbreviation = 'GSW';
+      break;
+    case ('NY'):
+      rosterLinkAbbreviation = 'NYK';
+      break;
+    case ('WSH'):
+      rosterLinkAbbreviation = 'WAS';
+      break;
+    default:
+      rosterLinkAbbreviation = abbreviation;
+      break;
+  }
+  return rosterLinkAbbreviation;
+}
+
+module.exports = {links, teams, getTeamRosterAbbreviation};

@@ -1,35 +1,58 @@
-
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
 const playerSchema = new Schema({
-  _id: Schema.Types.ObjectId,
-  firstName: {type: String, required: true },
-  lastName: {type: String, required: true },
-  birthPlace: {
-    city: {type: String, required: true },
-    state: {type: String},
-    country: {type: String, required: true }
+  // id: {type: String, required: true, unique: true},
+  // uid: {type: String, required: true, unique: true},
+  // guid: {type: String, required: true, unique: true},
+  // alternateIds: {type:Object},
+  firstName: {type: String, required: true},
+  lastName: {type: String, required: true},
+  // fullName: {type: String, required: true},
+  // displayName: {type: String, required: true},
+  // shortName: {type: String, required: true},
+  weight: {type: Number},
+  displayWeight: {type: String},
+  height: {type: Number},
+  displayHeight: {type: String},
+  age: {type: Number},
+  // dateOfBirth: {type: String},
+  // debutYear: {type: Number},
+  // links: {type: Array},
+  birthPlace: {type: Object
+    // city: {type: String, required: true},
+    // state: {type: String},
+    // country: {type: String, required: true}
   },
-  college: {
-    mascot: {type: String},
+  college: {type: Object
+    // id: {type: String, required: true},
+    // mascot: {type: String, required: true},
+    // name: {type: String, required: true},
+    // shortName: {type: String, required: true},
+    // abbrev: {type: String, required: true},
+  },
+  // slug: {type: String, required: true},
+  headshot: {type: Object
+    // href: {type: String, required: true},
+    // alt: {type: String, required: true},
+  },
+  jersey: {type: String},
+  // hand: {type: Object},
+  position: {     // type: Object
     name: {type: String},
-    abbrev: {type: String}
+    abbreviation: {type: String},
   },
-  league: {type: String, required: true },
-  team: {type: String, required: true },
-  jersey: {type: Number, required: true},
-  position: {
-    name: {type: String},
-    abbreviation: {type: String}
-  },
-  contracts: {type: Array, required: true},
-  earnings: {type: Number, required: true}
+  // injuries: {type: Array},
+  contracts: {type: Array},
+  experience: {type: Number},
+  // league: {type: String, required: true},
+  // team: {type: String, required: true},
+  // earnings: {type: Number, required: true}
 }, {
   timestamps: true,
 });
 
 const Player = mongoose.model('Player', playerSchema);
 
-module.exports = Player;
+module.exports = {Player, playerSchema};

@@ -53,7 +53,19 @@ async function getAthletes(league, team){
     //   athlete.team = team;
     //   athlete.earnings = earnings;
     // }
-    return response.body.athletes;
+    switch (league){
+      case 'NBA':
+      case 'WNBA':
+        return response.body.athletes;
+      case 'NFL':
+      case 'NHL':
+      case 'MLB':
+        let athletes = [];
+        for (let position of response.body.athletes) {
+          athletes.push(...position.items);
+        }
+        return athletes;
+    }
   }
 }
 
@@ -63,14 +75,12 @@ async function listAthletesOfTeam(league, team){
   if( !response ) return;
 
   if(response.body.athletes){
-    response.body.athletes[3].league = 'NBA';
-    response.body.athletes[3].team = team;
-    console.log(response.body.athletes[0]);
-    var earnings = 0;
-    for(contract of response.body.athletes[3].contracts){
-      earnings += contract.salary;
-    }
-    response.body.athletes[3].earnings = formatter.format(earnings);
+    console.log(response.body.athletes[0].items);
+    // var earnings = 0;
+    // for(contract of response.body.athletes[3].contracts){
+    //   earnings += contract.salary;
+    // }
+    // response.body.athletes[3].earnings = formatter.format(earnings);
     // console.log(response.body.athletes[3].earnings);
   }
 }
@@ -189,7 +199,7 @@ async function listTeamsTest(){
 
 async function main(){
   // listAthletesOfSchool('North Carolina');
-  // listAthletesOfTeam('NBA','DAL');
+  // listAthletesOfTeam('NHL','DAL');
   // listTeamsOfLeague('NBA');
   // listTeam('NFL','ATL');
   // listTeamsTest();

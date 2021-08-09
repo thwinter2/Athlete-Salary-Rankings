@@ -1,13 +1,13 @@
 const router = require('express').Router();
 const {League} = require('../models/league');
-const {links, teams, getTeamRosterAbbreviation} = require("../globals.js");
+const {links} = require("../globals.js");
 const { getLeague, getAthletes } = require('../espn');
 var mongoose = require('mongoose');
 var async = require('async');
 const {Team} = require('../models/team');
 const {Player} = require('../models/player');
 
-async function addLeague(league){
+async function addLeague(league, leagueAbbreviation){
   let id = league.id;
   let name = league.name;
   let abbreviation = league.abbreviation;
@@ -32,6 +32,8 @@ async function addLeague(league){
     let abbreviation = teamData.team.abbreviation;
     let displayName = teamData.team.displayName;
     let shortDisplayName = teamData.team.shortDisplayName;
+    let color = teamData.team.color;
+    let alternateColor = teamData.team.alternateColor;
     let league = newLeague._id;
     let players = [];
     const newTeam = new Team({
@@ -44,11 +46,13 @@ async function addLeague(league){
       abbreviation,
       displayName,
       shortDisplayName,
+      color,
+      alternateColor,
       league,
       players,
     });
-    let rosterAbbreviation = getTeamRosterAbbreviation(newTeam.abbreviation);
-    let athletes = await getAthletes('NBA', rosterAbbreviation);
+    let rosterAbbreviation = newTeam.abbreviation;
+    let athletes = await getAthletes(leagueAbbreviation, rosterAbbreviation);
     async.each(athletes, (playerData, callback) => {
       let id = playerData.id;
       let uid = playerData.uid;
@@ -116,15 +120,15 @@ async function addLeague(league){
       .then(() => {
         newTeam.players.push(newPlayer);
         callback();
-      })
+      });
     })
     .then(() => {
       newTeam.save()
       .then(() => {
         newLeague.teams.push(newTeam);
-      })
-    })
-  })
+      });
+    });
+  });
   return newLeague;
 }
 
@@ -134,19 +138,18 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(400).json('error: ' + err));
 });
 
-router.route('/add-all').get(async (req, res) => {
+router.route('/add/all').get(async (req, res) => {
   await League.collection.drop()
     .catch();
   await Team.collection.drop()
     .catch();
   await Player.collection.drop()
     .catch();
-  async.forEach(Object.keys(links), (leagueAbbreviation, callback) => {
+  async.forEach(Object.keys(links), async (leagueAbbreviation) => {
     await getLeague(leagueAbbreviation)
-    .then((league) => {
-    let newLeague = await addLeague(league);
+    .then(async (league) => {
+    let newLeague = await addLeague(league, leagueAbbreviation);
     newLeague.save();
-    callback();
     });
   })
   .then(() => res.json('All Leagues Added!'))
@@ -161,8 +164,8 @@ router.route('/add/nba').get(async (req, res) => {
   await Player.collection.drop()
     .catch();
   await getLeague('NBA')
-  .then((league) => {
-    let newLeague = await addLeague(league);
+  .then(async (league) => {
+    let newLeague = await addLeague(league, 'NBA');
     newLeague.save()
     .then(() => res.json('NBA League Added!'))
     .catch(err => res.status(400).json('Error: ' + err));
@@ -173,26 +176,6 @@ router.route('/:id').get((req, res) => {
   League.findbyid(req.params.id)
   .then(league => res.json(league))
   .catch(err => res.status(400).json('error: ' + err))
-});
-  
-router.route('/:id').delete((req, res) => {
-  League.findbyidanddelete(req.params.id)
-  .then(() => res.json('League deleted.'))
-  .catch(err => res.status(400).json('error: ' + err))
-});
-  
-router.route('/update/:id').post((req, res) => {
-  League.findbyid(req.params.id)
-  .then(league => {
-    league.name = req.body.name;
-    league.location = req.body.location;
-    league.players = req.body.players;
-  
-    league.save()
-    .then(() => res.json('League updated!'))
-    .catch(err => res.status(400).json('Error: ' + err))
-    })
-    .catch(err => res.status(400).json('Error: ' + err))
 });
 
 module.exports = router;

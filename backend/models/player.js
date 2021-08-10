@@ -47,7 +47,9 @@ const playerSchema = new Schema({
   contracts: {type: Array},
   experience: {type: Number},
   league: {type: Schema.Types.ObjectId, ref: 'League'},
+  leagueName: {type: String,},
   team: {type: Schema.Types.ObjectId, ref: 'Team'},
+  teamName: {type: String,},
   // earnings: {type: Number, required: true}
 }, {
   timestamps: true,

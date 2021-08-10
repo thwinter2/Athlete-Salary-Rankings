@@ -35,6 +35,7 @@ async function addLeague(league, leagueAbbreviation){
     let color = teamData.team.color;
     let alternateColor = teamData.team.alternateColor;
     let league = newLeague._id;
+    let leagueName = leagueAbbreviation;
     let players = [];
     const newTeam = new Team({
       _id: new mongoose.Types.ObjectId(),
@@ -49,6 +50,7 @@ async function addLeague(league, leagueAbbreviation){
       color,
       alternateColor,
       league,
+      leagueName,
       players,
     });
     let rosterAbbreviation = newTeam.abbreviation;
@@ -82,7 +84,9 @@ async function addLeague(league, leagueAbbreviation){
       let contracts = playerData.contracts;
       let experience = playerData.experience.years;
       let league = newTeam.league;
+      let leagueName = leagueAbbreviation;
       let team = newTeam._id;
+      let teamName = newTeam.displayName;
       let earnings = playerData.earnings;
       const newPlayer = new Player({
         id,
@@ -113,7 +117,9 @@ async function addLeague(league, leagueAbbreviation){
         contracts,
         experience,
         league,
+        leagueName,
         team,
+        teamName,
         earnings,
       });
       newPlayer.save()
@@ -172,9 +178,37 @@ router.route('/add/nba').get(async (req, res) => {
   })
 });
 
-router.route('/:id').get((req, res) => {
-  League.findbyid(req.params.id)
-  .then(league => res.json(league))
+router.route('/add/teams').get((req, res) => {
+  League.find()
+  .then(leagues => {
+    leagues.forEach((league) => {
+      Team.find({league: league._id})
+      .then(teams => {
+        league.teams = teams;
+        league.save()
+      })
+    })
+  })
+  .then(() => res.json('Teams linked to Leagues'))
+  .catch(err => res.status(400).json('error: ' + err))
+});
+
+router.route('/:leagueAbbreviation').get((req, res) => {
+  League.findOne({abbreviation: req.params.leagueAbbreviation})
+  .populate({
+    path: 'teams',
+    populate: {path: 'players'}
+  })
+  .exec()
+  .then(league => res.json(league.teams))
+  .catch(err => res.status(400).json('error: ' + err))
+});
+
+router.route('/:leagueAbbreviation/:teamAbbreviation').get((req, res) => {
+  Team.findOne({leagueName: req.params.leagueAbbreviation, abbreviation: req.params.teamAbbreviation})
+  .populate('players')
+  .exec()
+  .then(team => res.json(team))
   .catch(err => res.status(400).json('error: ' + err))
 });
 

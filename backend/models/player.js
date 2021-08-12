@@ -50,7 +50,9 @@ const playerSchema = new Schema({
   leagueName: {type: String,},
   team: {type: Schema.Types.ObjectId, ref: 'Team'},
   teamName: {type: String,},
-  // earnings: {type: Number, required: true}
+  careerEarnings: {type: Number},
+  displayCareerEarnings: {type: String},
+  displayCurrentSalary: {type: String},
 }, {
   timestamps: true,
 });

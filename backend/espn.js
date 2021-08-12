@@ -10,8 +10,8 @@ const headers = {
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 });
 
 async function listAthletesOfSchool(school){
@@ -43,24 +43,28 @@ async function getAthletes(league, team){
   if( !response ) return;
 
   if(response.body.athletes){
-    // for(let athlete of response.body.athletes){
-    //   var earnings = athlete.contracts.reduce((previousValue, currentValue) => {
-    //     return {
-    //       salary: previousValue.salary + currentValue.salary
-    //     }
-    //   });
-    //   athlete.league = league;
-    //   athlete.team = team;
-    //   athlete.earnings = earnings;
-    // }
+    let athletes;
     switch (league){
       case 'NBA':
+        athletes = response.body.athletes;
+        for(let athlete of athletes){
+          if (athlete.contracts.length > 0) {
+            var earnings = 0;
+            for (contract of athlete.contracts) {
+              earnings += contract.salary;
+            }
+            athlete.careerEarnings = earnings;
+            athlete.displayCareerEarnings = formatter.format(earnings);
+            athlete.displayCurrentSalary = formatter.format(athlete.contracts[0].salary);
+          }
+        }
+        return athletes;
       case 'WNBA':
         return response.body.athletes;
       case 'NFL':
       case 'NHL':
       case 'MLB':
-        let athletes = [];
+        athletes = [];
         for (let position of response.body.athletes) {
           athletes.push(...position.items);
         }
@@ -75,13 +79,7 @@ async function listAthletesOfTeam(league, team){
   if( !response ) return;
 
   if(response.body.athletes){
-    console.log(response.body.athletes[0].items);
-    // var earnings = 0;
-    // for(contract of response.body.athletes[3].contracts){
-    //   earnings += contract.salary;
-    // }
-    // response.body.athletes[3].earnings = formatter.format(earnings);
-    // console.log(response.body.athletes[3].earnings);
+    console.log(response.body.athletes[0]);
   }
 }
 
@@ -214,7 +212,7 @@ async function listTeamsTest(){
 
 async function main(){
   // listAthletesOfSchool('North Carolina');
-  // listAthletesOfTeam('NHL','DAL');
+  // listAthletesOfTeam('NBA','DAL');
   // listTeamsOfLeague('NBA');
   // listTeam('NFL','ATL');
   // listTeamsTest();

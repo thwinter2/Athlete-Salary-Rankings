@@ -87,7 +87,9 @@ async function addLeague(league, leagueAbbreviation){
       let leagueName = leagueAbbreviation;
       let team = newTeam._id;
       let teamName = newTeam.displayName;
-      let earnings = playerData.earnings;
+      let careerEarnings = playerData.careerEarnings;
+      let displayCareerEarnings = playerData.displayCareerEarnings;
+      let displayCurrentSalary = playerData.displayCurrentSalary;
       const newPlayer = new Player({
         id,
         uid,
@@ -120,7 +122,9 @@ async function addLeague(league, leagueAbbreviation){
         leagueName,
         team,
         teamName,
-        earnings,
+        careerEarnings,
+        displayCareerEarnings,
+        displayCurrentSalary,
       });
       newPlayer.save()
       .then(() => {

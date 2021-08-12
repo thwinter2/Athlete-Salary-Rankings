@@ -4,11 +4,18 @@ const Schema = mongoose.Schema;
 
 const collegeSchema = new Schema({
     _id: Schema.Types.ObjectId,
-    espnID: {type: String, required: true, unique: true},
-    mascot: {type: String, required: true},
-    name: {type: String, require: true},
+    // id: {type: String, required: true, unique: true},
+    // slug: {type: String, required: true, unique: true},
+    location: {type: String, required: true},
+    name: {type: String, require: true},    // mascot
+    nickname: {type: String, required: true},
     abbreviation: {type: String, required: true},
-    players: [{type: Schema.Types.ObjectId, ref: 'Player'}],
+    displayName: {type: String, required: true, unique: true},
+    shortDisplayName: {type: String, required: true},
+    color: {type: String},
+    alternateColor: {type: String},
+    logos: {type: Object},
+    // links: {type: Array},
 }, {
     timestamps: true,
 });

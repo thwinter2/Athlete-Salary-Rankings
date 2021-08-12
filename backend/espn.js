@@ -170,6 +170,21 @@ async function getLeague(league){
   }
 }
 
+async function getColleges(){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?limit=1000', { headers: headers, responseType: 'json' })
+                      .catch(err => console.error(`listTeamsTest ${err}`));
+  if( !response ) return;
+
+  if(response.body){
+    let colleges = response.body.sports[0].leagues[0].teams;
+    let newColleges = [];
+    for (let college of colleges) {
+      newColleges.push(college.team);
+    }
+    return newColleges;
+  }
+}
+
 async function listTeam(league, team){
   let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team, { headers: headers, responseType: 'json' })
                       .catch(err => console.error(`listTeam ${err}`));
@@ -187,7 +202,7 @@ async function listTeamsTest(){
   if( !response ) return;
 
   if(response.body){
-    let league = response.body.sports[0].leagues[0];
+    let league = response.body.sports[0].leagues[0].teams[41];
     let teams = league.teams;
     // league.teams = [];
     console.log(league);
@@ -212,4 +227,4 @@ async function main(){
 })();
 
 module.exports = {listAthletesOfSchool, listAthletesOfTeam, getTeamsOfLeague, getAthletes, getTeam, getTeamSize,
-                getLeague};
+                getLeague, getColleges};

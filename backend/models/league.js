@@ -5,11 +5,11 @@ const Schema = mongoose.Schema;
 
 const leagueSchema = new Schema({
   _id: Schema.Types.ObjectId,
-  id: {type: String, required: true, unique: true},
+  // id: {type: String, required: true, unique: true},
   name: {type: String, required: true, unique: true},
   abbreviation: {type: String, required: true, unique: true},
   shortName: {type: String, unique: true},
-  slug: {type: String, required: true, unique: true},
+  // slug: {type: String, required: true, unique: true},
   teams: [{type: Schema.Types.ObjectId, ref: 'Team'}],
 }, {
   timestamps: true,

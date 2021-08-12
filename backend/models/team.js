@@ -5,9 +5,9 @@ const Schema = mongoose.Schema;
 
 const teamSchema = new Schema({
     _id: Schema.Types.ObjectId,
-    id: {type: String, required: true, unique: true},
-    uid: {type: String, required: true, unique: true},
-    slug: {type: String, required: true, unique: true},
+    // id: {type: String, required: true, unique: true},
+    // uid: {type: String, required: true, unique: true},
+    // slug: {type: String, required: true, unique: true},
     location: {type: String, required: true},
     name: {type: String},
     abbreviation: {type: String, required: true},

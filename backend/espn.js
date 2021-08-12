@@ -48,15 +48,18 @@ async function getAthletes(league, team){
       case 'NBA':
         athletes = response.body.athletes;
         for(let athlete of athletes){
+          var earnings = 0;
           if (athlete.contracts.length > 0) {
-            var earnings = 0;
             for (contract of athlete.contracts) {
               earnings += contract.salary;
             }
+          }
+          else {
+            athlete.contracts = [{salary: 0}]
+          }
             athlete.careerEarnings = earnings;
             athlete.displayCareerEarnings = formatter.format(earnings);
             athlete.displayCurrentSalary = formatter.format(athlete.contracts[0].salary);
-          }
         }
         return athletes;
       case 'WNBA':

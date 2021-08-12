@@ -3,14 +3,16 @@ const {Player} = require('../models/player');
 
 router.route('/').get((req, res) => {
   Player.find()
-    .then(players => res.json(players))
-    .catch(err => res.status(400).json('Error: ' + err));
+  .then(players => res.json(players))
+  .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/:leagueAbbreviation').get((req, res) => {
   Player.find({leagueName: req.params.leagueAbbreviation})
-    .then(players => res.json(players))
-    .catch(err => res.status(400).json('Error: ' + err));
+  .populate('team')
+  .exec()
+  .then(players => res.json(players))
+  .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route('/:id').get((req, res) => {

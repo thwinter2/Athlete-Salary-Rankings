@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import Navbar from "./components/navbar.component";
 import Players from "./components/players/players";
+import PlayersChart from "./components/chart/chart";
 import "./App.css";
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
     <div className="App">
       <Navbar />
       <br/>
-      <Route path="/" exact component={Players} />
+      <Route path="/" exact component={PlayersChart} />
     </div>
    </Router>
  );

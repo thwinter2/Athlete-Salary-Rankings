@@ -1,0 +1,8 @@
+.arrowContainer img{
+  width: 16px;
+  height: 16px;
+}
+
+img.desc {
+  transform: rotate(180deg);
+}

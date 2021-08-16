@@ -16,8 +16,12 @@ export default class PlayersChart extends Component {
       players: [],
       colleges: [],
       chartData: [],
+      ascSalary: false,
+      ascEarnings: false,
     };
-    // this.sortByEarnings = this.sortByEarnings.bind(this);
+    this.handleEarningsClick = this.handleEarningsClick.bind(this);
+    this.handleSalaryClick = this.handleSalaryClick.bind(this);
+    this.setSortedData = this.setSortedData.bind(this);
   }
 
   componentDidMount() {
@@ -29,23 +33,41 @@ export default class PlayersChart extends Component {
         console.log(error);
       })
       .then(() => {
-        this.setSortedData('Earnings');
-        var chartData = [['Name', {label: 'Earnings',type:'number'},{role:'annotation'},{role:'style'}]];
-        for (let player of this.state.players){
-          chartData.push([
-            `${player.firstName} ${player.lastName}`,
-            player.careerEarnings,
-            player.displayCareerEarnings,
-            player.team.color,
-          ])
-        }
-        this.setState({chartData: chartData});
-        console.log(this.state);
+        this.setSortedData('Salary');
       })
   }
 
   setSortedData(sortBy) {
     this.setState({players:this.getSortedData(sortBy)});
+    this.setState({chartData:this.setChartData(sortBy)});
+    console.log(this.state.ascSalary);
+  }
+
+  setChartData(sortBy) {
+    var chartData = [['Name', {label: sortBy,type:'number'},{role:'annotation'},{role:'style'}]];
+    let sortProperty;
+    let annotation;
+    for (let player of this.state.players){
+      switch(sortBy){
+        case 'Earnings':
+          sortProperty = player.careerEarnings;
+          annotation = player.displayCareerEarnings;
+          break;
+        case 'Salary':
+          sortProperty = player.contracts[0].salary;
+          annotation = player.displayCurrentSalary;
+          break;
+        default:
+          break;
+      }
+      chartData.push([
+        `${player.firstName} ${player.lastName}`,
+        sortProperty,
+        annotation,
+        player.team.color,
+      ])
+    }
+    return chartData;
   }
   
   getSortedData(sortBy) {
@@ -54,9 +76,15 @@ export default class PlayersChart extends Component {
     dataToSort.sort((a,b) => {
       switch(sortBy) {
         case 'Salary':
-          return b.contracts[0].salary - a.contracts[0].salary;
+          if (this.state.ascSalary) {
+            return b.contracts[0].salary - a.contracts[0].salary;
+          }
+          return a.contracts[0].salary - b.contracts[0].salary;
         case 'Earnings':
-          return b.careerEarnings - a.careerEarnings;
+          if (this.state.ascEarnings) {
+            return b.careerEarnings - a.careerEarnings;
+          }
+          return a.careerEarnings - b.careerEarnings;
         default:
           return
       }
@@ -70,21 +98,33 @@ export default class PlayersChart extends Component {
     })
   }
 
+  handleSalaryClick(){
+    this.setState({ascSalary: !this.state.ascSalary});
+    this.setSortedData('Salary');
+  }
+
+  handleEarningsClick(){
+    this.setState({ascSalary: !this.state.ascEarnings});
+    this.setSortedData('Earnings');
+  }
+
   render() {
     return (
       <div>
         <h3>NBA Players</h3>
-        {/* <button onClick={this.setSortedData('Salary')}>Salary</button> */}
-        <button>Earnings</button>
+        <div className='arrowContainer'>
+          <img src='/images/blue-arrow.png' alt='Arrow' class={this.state.ascSalary ? '' : 'desc'}></img>
+          <button onClick={this.handleSalaryClick}>Salary</button>
+          <button onClick={this.handleEarningsClick}>Earnings</button>
+        </div>
           <Chart 
-          // chartArea={this.state.players.length * 3000}
           chartType='BarChart'
           loader={<div>Loading Chart</div>}
           data={this.state.chartData}
           options={{
-            height: this.state.chartData.length * 40,
+            height: this.state.chartData.length * 45,
             width: 1200,
-            // chartArea: {height: this.state.players.length * 40},
+            chartArea: {height: '100%'},
             fontSize: 12,
             hAxis: {minValue: 0},
             title: 'NBA Career Earnings',

@@ -34,17 +34,23 @@ export default class PlayersChart extends Component {
       })
       .then(() => {
         this.setSortedData('Salary');
+        this.setState({ascSalary: !this.state.ascSalary});
       })
   }
 
   setSortedData(sortBy) {
     this.setState({players:this.getSortedData(sortBy)});
     this.setState({chartData:this.setChartData(sortBy)});
-    console.log(this.state.ascSalary);
   }
 
   setChartData(sortBy) {
-    var chartData = [['Name', {label: sortBy,type:'number'},{role:'annotation'},{role:'style'}]];
+    var chartData = [[
+      {label: 'Name', type: 'string'},
+      {label: sortBy, type:'number'},
+      {role:'annotation'},
+      {type:'string', role:'tooltip', p:{html:true}},
+      {role:'style'}
+    ]];
     let sortProperty;
     let annotation;
     for (let player of this.state.players){
@@ -64,6 +70,7 @@ export default class PlayersChart extends Component {
         `${player.firstName} ${player.lastName}`,
         sortProperty,
         annotation,
+        `<img src=${player.headshot.href} alt="" width:"32" height:"32">`,
         player.team.color,
       ])
     }
@@ -77,14 +84,14 @@ export default class PlayersChart extends Component {
       switch(sortBy) {
         case 'Salary':
           if (this.state.ascSalary) {
-            return b.contracts[0].salary - a.contracts[0].salary;
+            return a.contracts[0].salary - b.contracts[0].salary;
           }
-          return a.contracts[0].salary - b.contracts[0].salary;
+          return b.contracts[0].salary - a.contracts[0].salary;
         case 'Earnings':
           if (this.state.ascEarnings) {
-            return b.careerEarnings - a.careerEarnings;
+            return a.careerEarnings - b.careerEarnings;
           }
-          return a.careerEarnings - b.careerEarnings;
+          return b.careerEarnings - a.careerEarnings;
         default:
           return
       }
@@ -100,11 +107,13 @@ export default class PlayersChart extends Component {
 
   handleSalaryClick(){
     this.setState({ascSalary: !this.state.ascSalary});
+    this.setState({ascEarnings: false});
     this.setSortedData('Salary');
   }
 
   handleEarningsClick(){
-    this.setState({ascSalary: !this.state.ascEarnings});
+    this.setState({ascEarnings: !this.state.ascEarnings});
+    this.setState({ascSalary: false});
     this.setSortedData('Earnings');
   }
 
@@ -113,7 +122,7 @@ export default class PlayersChart extends Component {
       <div>
         <h3>NBA Players</h3>
         <div className='arrowContainer'>
-          <img src='/images/blue-arrow.png' alt='Arrow' class={this.state.ascSalary ? '' : 'desc'}></img>
+          {/* <img src='/images/blue-arrow.png' alt='Arrow' class={this.state.ascSalary ? '' : 'desc'}></img> */}
           <button onClick={this.handleSalaryClick}>Salary</button>
           <button onClick={this.handleEarningsClick}>Earnings</button>
         </div>
@@ -127,7 +136,7 @@ export default class PlayersChart extends Component {
             chartArea: {height: '100%'},
             fontSize: 12,
             hAxis: {minValue: 0},
-            title: 'NBA Career Earnings',
+            tooltip: {isHtml: true},
             legend: {position: 'none'},
             animation: {
               startup: true,

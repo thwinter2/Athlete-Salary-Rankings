@@ -90,6 +90,9 @@ async function addLeague(league, leagueAbbreviation){
       let careerEarnings = playerData.careerEarnings;
       let displayCareerEarnings = playerData.displayCareerEarnings;
       let displayCurrentSalary = playerData.displayCurrentSalary;
+      if (!playerData.headshot) {
+        headshot = {href:'https://secure.espncdn.com/combiner/i?img=/i/headshots/nophoto.png', alt: `${playerData.firstName} ${playerData.lastName}`};
+      }
       const newPlayer = new Player({
         id,
         uid,

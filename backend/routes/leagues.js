@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const {League} = require('../models/league');
+const League = require('../models/league');
+const Team = require('../models/team');
+const Player = require('../models/player');
 const {links} = require("../globals.js");
 const { getLeague, getAthletes } = require('../espn');
 var mongoose = require('mongoose');
 var async = require('async');
-const {Team} = require('../models/team');
-const {Player} = require('../models/player');
 
 async function addLeague(league, leagueAbbreviation){
   let id = league.id;

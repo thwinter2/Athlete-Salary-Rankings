@@ -82,7 +82,7 @@ async function listAthletesOfTeam(league, team){
   if( !response ) return;
 
   if(response.body.athletes){
-    console.log(response.body.athletes[0]);
+    console.log(response.body.athletes[0].links);
   }
 }
 
@@ -192,8 +192,17 @@ async function listTeam(league, team){
   if( !response ) return;
 
   if(response.body){
-    response.body.team.league = league;
     console.log(response.body.team);
+  }
+}
+
+async function listTeamStats(league, team){
+  let response = await got('http://site.api.espn.com/apis/site/v2/sports/'+links[league]+'teams/'+team+'/statistics', { headers: headers, responseType: 'json' })
+                      .catch(err => console.error(`listTeam ${err}`));
+  if( !response ) return;
+
+  if(response.body){
+    console.log(response.body.results.stats.categories);
   }
 }
 
@@ -217,7 +226,7 @@ async function main(){
   // listAthletesOfSchool('North Carolina');
   // listAthletesOfTeam('NBA','DAL');
   // listTeamsOfLeague('NBA');
-  // listTeam('NFL','ATL');
+  // listTeamStats('NBA','ATL');
   // listTeamsTest();
   // listCollegesOfAthletesOfTeam('NHL','CAR');
 

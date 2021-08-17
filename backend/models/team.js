@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const {playerSchema} = require('./player.js');
 
 const Schema = mongoose.Schema;
 
@@ -27,4 +26,4 @@ const teamSchema = new Schema({
 
 const Team = mongoose.model('Team', teamSchema);
 
-module.exports = {Team, teamSchema};
+module.exports = Team;

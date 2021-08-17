@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 // import { Link } from 'react-router-dom';
 import axios from 'axios';
-import './chart.css';
+import './Chart.css';
 import Chart from "react-google-charts";
-
-const Player = props => (
-  [`${props.player.firstName} ${props.player.lastName}`,props.player.displayCareerEarnings]
-)
 
 export default class PlayersChart extends Component {
   constructor(props) {
@@ -15,6 +11,8 @@ export default class PlayersChart extends Component {
     this.state = {
       players: [],
       colleges: [],
+      teams: [],
+      listData: 'Players',
       chartData: [],
       ascSalary: false,
       ascEarnings: false,
@@ -22,6 +20,7 @@ export default class PlayersChart extends Component {
     this.handleEarningsClick = this.handleEarningsClick.bind(this);
     this.handleSalaryClick = this.handleSalaryClick.bind(this);
     this.setSortedData = this.setSortedData.bind(this);
+    this.setListData = this.setListData.bind(this);
   }
 
   componentDidMount() {
@@ -36,6 +35,18 @@ export default class PlayersChart extends Component {
         this.setSortedData('Salary');
         this.setState({ascSalary: !this.state.ascSalary});
       })
+
+      axios.get('http://localhost:5000/colleges')
+      .then(response => {
+        this.setState({ colleges: response.data })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
+
+  setListData(event) {
+    this.setState({listData:event.target.value});
   }
 
   setSortedData(sortBy) {
@@ -67,10 +78,10 @@ export default class PlayersChart extends Component {
           break;
       }
       chartData.push([
-        `${player.firstName} ${player.lastName}`,
+        `${player.fullName}`,
         sortProperty,
         annotation,
-        `<img src=${player.headshot.href} alt="" width:"32" height:"32">`,
+        `<img src=${player.headshot.href} alt=${player.headshot.alt} width="100" height="75" className="center"> <br><b>${player.fullName}</b> ${annotation}`,
         player.team.color,
       ])
     }
@@ -99,12 +110,6 @@ export default class PlayersChart extends Component {
     return dataToSort;
   }
 
-  playerList() {
-    return this.state.players.map(currentPlayer => {
-      return <Player player = {currentPlayer} key={currentPlayer._id}/>;
-    })
-  }
-
   handleSalaryClick(){
     this.setState({ascSalary: !this.state.ascSalary});
     this.setState({ascEarnings: false});
@@ -120,9 +125,14 @@ export default class PlayersChart extends Component {
   render() {
     return (
       <div>
-        <h3>NBA Players</h3>
+        <h3>Players</h3>
         <div className='arrowContainer'>
           {/* <img src='/images/blue-arrow.png' alt='Arrow' class={this.state.ascSalary ? '' : 'desc'}></img> */}
+          <select defaultValue={this.state.listData} onChange={this.setListData}>
+            <option value="Players">Players</option>
+            <option value="Colleges">Colleges</option>
+            <option value="Teams">Teams</option>
+          </select>
           <button onClick={this.handleSalaryClick}>Salary</button>
           <button onClick={this.handleEarningsClick}>Earnings</button>
         </div>
@@ -132,8 +142,13 @@ export default class PlayersChart extends Component {
           data={this.state.chartData}
           options={{
             height: this.state.chartData.length * 45,
-            width: 1200,
-            chartArea: {height: '100%'},
+            // width: 1200,
+            chartArea: {
+              height: '100%',
+              left: 200,
+              right: 24,
+              width: '100%'
+            },
             fontSize: 12,
             hAxis: {minValue: 0},
             tooltip: {isHtml: true},

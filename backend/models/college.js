@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const collegeSchema = new Schema({
     _id: Schema.Types.ObjectId,
-    // id: {type: String, required: true, unique: true},
+    id: {type: String, required: true, unique: true},
     // slug: {type: String, required: true, unique: true},
     location: {type: String, required: true},
     name: {type: String, require: true},    // mascot
@@ -16,6 +16,11 @@ const collegeSchema = new Schema({
     alternateColor: {type: String},
     logos: {type: Object},
     // links: {type: Array},
+    playerContracts: {type: Array},
+    totalCurrentSalary: {type: Number},
+    displayTotalCurrentSalary: {type: String},
+    totalCareerEarnings: {type: Number},
+    displayTotalCareerEarnings: {type: String},
 }, {
     timestamps: true,
 });

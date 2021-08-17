@@ -2,9 +2,8 @@ import React from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import Navbar from "./components/navbar.component";
-import Players from "./components/players/players";
-import PlayersChart from "./components/chart/chart";
+import Navbar from "./components/NavBar/Navbar";
+import PlayersChart from "./components/Chart/Chart";
 import "./App.css";
 
 function App() {

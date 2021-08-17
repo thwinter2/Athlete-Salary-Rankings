@@ -9,7 +9,7 @@ const playerSchema = new Schema({
   // alternateIds: {type:Object},
   firstName: {type: String, required: true},
   lastName: {type: String, required: true},
-  // fullName: {type: String, required: true},
+  fullName: {type: String, required: true},
   // displayName: {type: String, required: true},
   // shortName: {type: String, required: true},
   weight: {type: Number},
@@ -59,4 +59,4 @@ const playerSchema = new Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-module.exports = {Player, playerSchema};
+module.exports = Player;

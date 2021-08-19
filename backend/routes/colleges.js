@@ -25,30 +25,29 @@ router.route('/add').get(async (req, res) => {
     College.find()
     .then(colleges => {
       colleges.forEach(college => {
-        let playerContracts = [];
-        let totalCurrentSalary = 0;
-        let displayTotalCurrentSalary = '';
-        let totalCareerEarnings = 0;
-        let displayTotalCareerEarnings = '';
+        let contracts = new Map;
+        let currentSalary = 0;
+        let displayCurrentSalary = '';
+        let careerEarnings = 0;
+        let displayCareerEarnings = '';
         Player.find({'college.id': college.id})
         .then(players => {
           players.forEach(player => {
-            playerContracts.push(player.contracts);
-            totalCurrentSalary += player.contracts[0].salary;
-            totalCareerEarnings += player.careerEarnings;
+            player.contracts.forEach((salary, year, map) => {
+              let newSalary = contracts.has(`${year}`) ? contracts.get(`${year}`).salaryNumber + salary.salaryNumber : salary.salaryNumber;
+              contracts.set(`${year}`, {salaryNumber: newSalary, salaryString: formatter.format(newSalary)});
+            })
+            careerEarnings += player.careerEarnings;
           })
         })
         .then(() => {
-          console.log('here')
-          displayTotalCurrentSalary = formatter.format(totalCurrentSalary);
-          displayTotalCareerEarnings = formatter.format(totalCareerEarnings);
-          console.log(displayTotalCareerEarnings);
-          console.log(`College: ${college.displayName}  Total Earnings: ${displayTotalCareerEarnings}`);
-          college.playerContracts = playerContracts;
-          college.totalCurrentSalary = totalCurrentSalary;
-          college.displayTotalCurrentSalary = displayTotalCurrentSalary;
-          college.totalCareerEarnings = totalCareerEarnings;
-          college.displayTotalCareerEarnings = displayTotalCareerEarnings;
+          // displayCurrentSalary = formatter.format(currentSalary);
+          displayCareerEarnings = formatter.format(careerEarnings);
+          college.contracts = contracts;
+          college.currentSalary = currentSalary;
+          college.displayCurrentSalary = displayCurrentSalary;
+          college.careerEarnings = careerEarnings;
+          college.displayCareerEarnings = displayCareerEarnings;
           college.save()
         })
         .catch(err => console.log('Error ' + err));

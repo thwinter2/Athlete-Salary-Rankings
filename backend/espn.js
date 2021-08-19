@@ -48,18 +48,21 @@ async function getAthletes(league, team){
       case 'NBA':
         athletes = response.body.athletes;
         for(let athlete of athletes){
-          var earnings = 0;
+          let contracts = new Map;
+          let earnings = 0;
           if (athlete.contracts.length > 0) {
             for (contract of athlete.contracts) {
               earnings += contract.salary;
+              contracts.set(`${contract.season.year}`, {salaryNumber: contract.salary, salaryString: formatter.format(contract.salary)});
             }
+            athlete.contracts = contracts;
           }
           else {
-            athlete.contracts = [{salary: 0}]
+            contracts.set('2022', {salaryNumber: 0, salaryString: '$0'});
           }
             athlete.careerEarnings = earnings;
             athlete.displayCareerEarnings = formatter.format(earnings);
-            athlete.displayCurrentSalary = formatter.format(athlete.contracts[0].salary);
+            // athlete.displayCurrentSalary = athlete.contracts.has('2022') ? athlete.contracts.get('2022').salaryString : athlete.contracts.get('2021').salaryString;
         }
         return athletes;
       case 'WNBA':

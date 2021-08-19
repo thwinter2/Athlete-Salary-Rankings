@@ -44,7 +44,7 @@ const playerSchema = new Schema({
     abbreviation: {type: String},
   },
   // injuries: {type: Array},
-  contracts: {type: Array},
+  contracts: {type: Map},
   experience: {type: Number},
   league: {type: Schema.Types.ObjectId, ref: 'League'},
   leagueName: {type: String,},

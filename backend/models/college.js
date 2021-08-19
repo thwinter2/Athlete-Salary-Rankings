@@ -16,11 +16,11 @@ const collegeSchema = new Schema({
     alternateColor: {type: String},
     logos: {type: Object},
     // links: {type: Array},
-    playerContracts: {type: Array},
-    totalCurrentSalary: {type: Number},
-    displayTotalCurrentSalary: {type: String},
-    totalCareerEarnings: {type: Number},
-    displayTotalCareerEarnings: {type: String},
+    contracts: {type: Map},
+    currentSalary: {type: Number},
+    displayCurrentSalary: {type: String},
+    careerEarnings: {type: Number},
+    displayCareerEarnings: {type: String},
 }, {
     timestamps: true,
 });

@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 // import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './Chart.css';
-import Chart from "react-google-charts";
+import Chart from 'react-google-charts';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { addYears } from 'date-fns';
 
 export default class PlayersChart extends Component {
   constructor(props) {
@@ -12,28 +15,33 @@ export default class PlayersChart extends Component {
       players: [],
       colleges: [],
       teams: [],
-      listData: 'Players',
+      listData: [],
       chartData: [],
-      ascSalary: false,
-      ascEarnings: false,
+      listBy: 'Players',
+      sortBy: 'Earnings',
+      asc: 'false',
+      date: new Date(),
+      year: 2020,
     };
-    this.handleEarningsClick = this.handleEarningsClick.bind(this);
-    this.handleSalaryClick = this.handleSalaryClick.bind(this);
+  
     this.setSortedData = this.setSortedData.bind(this);
-    this.setListData = this.setListData.bind(this);
+    this.getSortedData = this.getSortedData.bind(this);
+    this.handleChangeListBy = this.handleChangeListBy.bind(this);
+    this.handleChangeYear = this.handleChangeYear.bind(this);
+    this.handleChangeSortDirection = this.handleChangeSortDirection.bind(this);
+    this.handleChangeSortBy = this.handleChangeSortBy.bind(this);
   }
 
   componentDidMount() {
     axios.get('http://localhost:5000/players/NBA')
       .then(response => {
-        this.setState({ players: response.data })
+        this.setState({ players: response.data, listData: response.data})
       })
       .catch((error) => {
         console.log(error);
       })
       .then(() => {
-        this.setSortedData('Salary');
-        this.setState({ascSalary: !this.state.ascSalary});
+        this.setSortedData();
       })
 
       axios.get('http://localhost:5000/colleges')
@@ -45,126 +53,207 @@ export default class PlayersChart extends Component {
       })
   }
 
-  setListData(event) {
-    this.setState({listData:event.target.value});
+  handleChangeListBy(event) {
+    let listData;
+    switch(event.target.value) {
+      case 'Colleges':
+        listData = this.state.colleges;
+      break;
+      case 'Teams':
+        listData = this.state.teams;
+      break;
+      default:
+        listData = this.state.players;
+        break;
+      }
+    this.setState({listData: listData, listBy: event.target.value}, () => {
+      this.setSortedData();
+    });
   }
 
-  setSortedData(sortBy) {
-    this.setState({players:this.getSortedData(sortBy)});
-    this.setState({chartData:this.setChartData(sortBy)});
+  setSortedData() {
+    this.setState({listData:this.getSortedData()}, () => {
+      this.setState({chartData:this.setChartData()});
+    });
   }
 
-  setChartData(sortBy) {
+  getSortedData() {
+    let dataToSort = [];
+    let year = this.state.year;
+
+    switch (this.state.listBy) {
+      case 'Colleges':
+        dataToSort = this.state.colleges;
+        break;
+      case 'Teams':
+        dataToSort = this.state.teams;
+        break;
+      default:
+        dataToSort = this.state.players;
+        break;
+      }
+
+    switch(this.state.sortBy) {
+      case 'Salary':
+        return dataToSort
+        .filter(obj => typeof obj.contracts[year] !== 'undefined')
+        .sort((a,b) => {
+          return (this.state.asc === 'true') ? a.contracts[year].salaryNumber - b.contracts[year].salaryNumber : b.contracts[year].salaryNumber - a.contracts[year].salaryNumber;
+        });
+      case 'Earnings':
+        return dataToSort.sort((a,b) => {
+          return (this.state.asc === 'true') ? a.careerEarnings - b.careerEarnings : b.careerEarnings - a.careerEarnings;
+        });
+      default:
+        return dataToSort;
+    }
+  }
+
+  setChartData() {
     var chartData = [[
       {label: 'Name', type: 'string'},
-      {label: sortBy, type:'number'},
+      {label: this.state.sortBy, type:'number'},
       {role:'annotation'},
       {type:'string', role:'tooltip', p:{html:true}},
       {role:'style'}
     ]];
+    let name;
     let sortProperty;
     let annotation;
-    for (let player of this.state.players){
-      switch(sortBy){
+    let tooltip;
+    let style;
+    let year = this.state.year;
+
+    for (let datum of this.state.listData){
+      switch(this.state.sortBy){
         case 'Earnings':
-          sortProperty = player.careerEarnings;
-          annotation = player.displayCareerEarnings;
-          break;
+          sortProperty = datum.careerEarnings;
+          annotation = datum.displayCareerEarnings;
+        break;
         case 'Salary':
-          sortProperty = player.contracts[0].salary;
-          annotation = player.displayCurrentSalary;
-          break;
+          sortProperty = datum.contracts[year].salaryNumber;
+          annotation = datum.contracts[year].salaryString;
+        break;
         default:
-          break;
+        break;
       }
-      chartData.push([
-        `${player.fullName}`,
-        sortProperty,
-        annotation,
-        `<img src=${player.headshot.href} alt=${player.headshot.alt} width="100" height="75" className="center"> <br><b>${player.fullName}</b> ${annotation}`,
-        player.team.color,
-      ])
+      if (sortProperty > 0) {
+        switch(this.state.listBy){
+          default:
+            name = `${datum.fullName}`;
+            tooltip = `<img src=${datum.headshot.href} alt=${datum.headshot.alt} width='100' height='75' className='center'> <br><b>${datum.fullName}</b> ${annotation}`;
+            style = datum.team.color;
+          break;
+          case 'Colleges':
+            name = `${datum.location}`;
+            if (datum.logos) {
+              tooltip = `<img src=${datum.logos[0].href} alt=${datum.logos[0].alt} width='100' height='100' className='center'> <br><b>${datum.displayName}</b> ${annotation}`;
+            } else {
+              tooltip = `${datum.displayName}</b> ${annotation}`;}
+            style = datum.color;
+          break;
+        }
+        chartData.push([
+          name,
+          sortProperty,
+          annotation,
+          tooltip,
+          style,
+        ])
+      }
     }
     return chartData;
   }
   
-  getSortedData(sortBy) {
-    let dataToSort = this.state.players;
-
-    dataToSort.sort((a,b) => {
-      switch(sortBy) {
-        case 'Salary':
-          if (this.state.ascSalary) {
-            return a.contracts[0].salary - b.contracts[0].salary;
-          }
-          return b.contracts[0].salary - a.contracts[0].salary;
-        case 'Earnings':
-          if (this.state.ascEarnings) {
-            return a.careerEarnings - b.careerEarnings;
-          }
-          return b.careerEarnings - a.careerEarnings;
-        default:
-          return
-      }
+  handleChangeYear(date){
+    this.setState({date: date, year: date.getFullYear()}, () => {
+      this.setSortedData();
     });
-    return dataToSort;
   }
 
-  handleSalaryClick(){
-    this.setState({ascSalary: !this.state.ascSalary});
-    this.setState({ascEarnings: false});
-    this.setSortedData('Salary');
+  handleChangeSortDirection(event){
+    if(event.target.checked) {
+      this.setState({asc: event.target.value}, () => {
+        this.setSortedData();
+      });
+    }
   }
 
-  handleEarningsClick(){
-    this.setState({ascEarnings: !this.state.ascEarnings});
-    this.setState({ascSalary: false});
-    this.setSortedData('Earnings');
+  handleChangeSortBy(event) {
+    this.setState({sortBy: event.target.value}, () => {
+      this.setSortedData();
+    })
   }
 
   render() {
     return (
       <div>
-        <h3>Players</h3>
+        <h3>{this.state.listBy}</h3>
         <div className='arrowContainer'>
           {/* <img src='/images/blue-arrow.png' alt='Arrow' class={this.state.ascSalary ? '' : 'desc'}></img> */}
-          <select defaultValue={this.state.listData} onChange={this.setListData}>
-            <option value="Players">Players</option>
-            <option value="Colleges">Colleges</option>
-            <option value="Teams">Teams</option>
+          <select defaultValue='Players' onChange={this.handleChangeListBy}>
+            <option value='Players'>Players</option>
+            <option value='Colleges'>Colleges</option>
+            <option value='Teams'>Teams</option>
           </select>
-          <button onClick={this.handleSalaryClick}>Salary</button>
-          <button onClick={this.handleEarningsClick}>Earnings</button>
+          <div>
+            {this.state.sortBy !== 'Earnings' ?
+            <DatePicker
+              selected={this.state.date}
+              onChange={(date) => this.handleChangeYear(date)}
+              showYearPicker
+              dateFormat='yyyy'
+              maxDate={addYears(new Date(), 1)}
+              showPopperArrow={false}
+            />
+            : <br/>
+          }
+          </div>
+          <div>
+            <input type='radio' id='desc' name='direction' value='false' defaultChecked onChange={this.handleChangeSortDirection}/>
+            <label for='desc'>Descending</label>
+          </div>
+          <div>
+            <input type='radio' id='asc' name='direction' value='true' onChange={this.handleChangeSortDirection}/>
+            <label for='asc'>Ascending</label>
+          </div>
+          <div>
+            <select defaultValue='Earnings' onChange={this.handleChangeSortBy}>
+              <option value='Earnings'>Earnings</option>
+              <option value='Salary'>Salary</option>
+            </select>
+          </div>
         </div>
+        <div>
           <Chart 
-          chartType='BarChart'
-          loader={<div>Loading Chart</div>}
-          data={this.state.chartData}
-          options={{
-            height: this.state.chartData.length * 45,
-            // width: 1200,
-            chartArea: {
-              height: '100%',
-              left: 200,
-              right: 24,
-              width: '100%'
-            },
-            fontSize: 12,
-            hAxis: {minValue: 0},
-            tooltip: {isHtml: true},
-            legend: {position: 'none'},
-            animation: {
-              startup: true,
-              easing: 'linear',
-              duration: 1000,
-            },
-            annotations: {
-              textStyle: {
-                fontSize: 14
-              }
-            }
-          }}
+            chartType='BarChart'
+            loader={<div>Loading Chart</div>}
+            data={this.state.chartData}
+            options={{
+              height: this.state.chartData.length * 45,
+              chartArea: {
+                height: '100%',
+                left: 200,
+                right: 24,
+                width: '100%'
+              },
+              fontSize: 12,
+              hAxis: {minValue: 0},
+              tooltip: {trigger: 'selection', isHtml: true},
+              legend: {position: 'none'},
+              animation: {
+                startup: true,
+                easing: 'linear',
+                duration: 1000,
+              },
+              annotations: {
+                textStyle: {
+                  fontSize: 14
+                },
+              },
+            }}
           />
+        </div>
       </div>
     )
   }

@@ -13,3 +13,7 @@ img.desc {
   margin-right: auto;
   width: 50%;
 }
+
+#chart_div{
+  cursor: pointer
+}
